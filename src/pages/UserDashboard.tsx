@@ -36,6 +36,10 @@ export default function UserDashboard() {
   const [activeTab, setActiveTab] = useState(searchParams.get("tab") || "profile");
   const [selectedOrderForInvoice, setSelectedOrderForInvoice] = useState<string | null>(null);
   const [showInvoice, setShowInvoice] = useState(false);
+  const [trackingId, setTrackingId] = useState("");
+  const [trackedOrder, setTrackedOrder] = useState<any>(null);
+  const [trackingError, setTrackingError] = useState("");
+  const [isTrackingLoading, setIsTrackingLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     name: "",
