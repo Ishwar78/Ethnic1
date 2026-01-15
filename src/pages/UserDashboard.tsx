@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { User, Mail, Phone, MapPin, Edit2, Save, X, Package, ShoppingBag, Calendar } from "lucide-react";
+import { User, Mail, Phone, MapPin, Edit2, Save, X, Package, ShoppingBag, Calendar, Search, Truck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -36,6 +36,10 @@ export default function UserDashboard() {
   const [activeTab, setActiveTab] = useState(searchParams.get("tab") || "profile");
   const [selectedOrderForInvoice, setSelectedOrderForInvoice] = useState<string | null>(null);
   const [showInvoice, setShowInvoice] = useState(false);
+  const [trackingId, setTrackingId] = useState("");
+  const [trackedOrder, setTrackedOrder] = useState<any>(null);
+  const [trackingError, setTrackingError] = useState("");
+  const [isTrackingLoading, setIsTrackingLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -123,6 +127,35 @@ export default function UserDashboard() {
       description: "You have been logged out successfully.",
     });
     navigate("/");
+  };
+
+  const handleTrackOrder = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!trackingId.trim()) {
+      setTrackingError("Please enter a tracking ID");
+      return;
+    }
+
+    setIsTrackingLoading(true);
+    setTrackingError("");
+    setTrackedOrder(null);
+
+    try {
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+      const response = await fetch(`${API_URL}/orders/track/${encodeURIComponent(trackingId)}`);
+      const data = await response.json();
+
+      if (!response.ok) {
+        setTrackingError(data.error || "Order not found");
+        return;
+      }
+
+      setTrackedOrder(data.order);
+    } catch (error) {
+      setTrackingError("Failed to fetch order details");
+    } finally {
+      setIsTrackingLoading(false);
+    }
   };
 
   // Show loading state while checking auth
@@ -310,6 +343,123 @@ export default function UserDashboard() {
 
       case "support":
         return <SupportTicketForm />;
+
+      case "track":
+        return (
+          <div>
+            <h2 className="text-2xl font-bold mb-6">Track Order</h2>
+            <div className="bg-card rounded-2xl shadow-card border border-border p-8">
+              <form onSubmit={handleTrackOrder} className="mb-8">
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-foreground mb-2">
+                      Enter Tracking ID
+                    </label>
+                    <div className="flex gap-2">
+                      <div className="flex-1 relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                        <input
+                          type="text"
+                          placeholder="e.g., INV-1234567890-ABCD"
+                          value={trackingId}
+                          onChange={(e) => setTrackingId(e.target.value)}
+                          className="w-full pl-10 pr-4 py-2 rounded-lg border border-border bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                        />
+                      </div>
+                      <Button type="submit" variant="gold" disabled={isTrackingLoading}>
+                        {isTrackingLoading ? "Tracking..." : "Track"}
+                      </Button>
+                    </div>
+                    {trackingError && <p className="text-sm text-destructive mt-2">{trackingError}</p>}
+                  </div>
+                </div>
+              </form>
+
+              {trackedOrder && (
+                <div className="space-y-6">
+                  <div className="bg-muted/30 rounded-lg p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <div>
+                        <p className="text-xs font-semibold text-muted-foreground uppercase mb-1">Order Status</p>
+                        <p className="text-2xl font-bold text-foreground">
+                          {trackedOrder.status?.charAt(0).toUpperCase() + (trackedOrder.status?.slice(1) || '')}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-xs font-semibold text-muted-foreground uppercase mb-1">Total Amount</p>
+                        <p className="text-2xl font-bold text-primary">
+                          ₹{(trackedOrder.totalAmount || 0).toLocaleString("en-IN")}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {trackedOrder.items && trackedOrder.items.length > 0 && (
+                    <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-6">
+                      <h4 className="font-semibold text-sm mb-4 text-foreground">Order Items</h4>
+                      <div className="space-y-3">
+                        {trackedOrder.items.map((item: any, index: number) => (
+                          <div key={index} className="flex justify-between text-sm">
+                            <div>
+                              <p className="font-medium">{item.name} x {item.quantity}</p>
+                              {item.size && <p className="text-xs text-muted-foreground">(Size: {item.size})</p>}
+                              {item.color && <p className="text-xs text-muted-foreground">(Color: {item.color})</p>}
+                            </div>
+                            <span className="text-foreground font-semibold">
+                              ₹{(item.price || 0).toLocaleString("en-IN")}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {trackedOrder.shippingAddress && (
+                    <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-6">
+                      <h4 className="font-semibold text-sm mb-4 text-foreground">Shipping Address</h4>
+                      <div className="space-y-2 text-sm text-foreground">
+                        {trackedOrder.shippingAddress.name && (
+                          <p className="font-medium">{trackedOrder.shippingAddress.name}</p>
+                        )}
+                        {trackedOrder.shippingAddress.street && (
+                          <p>{trackedOrder.shippingAddress.street}</p>
+                        )}
+                        {(trackedOrder.shippingAddress.city || trackedOrder.shippingAddress.state) && (
+                          <p>
+                            {trackedOrder.shippingAddress.city}
+                            {trackedOrder.shippingAddress.city && trackedOrder.shippingAddress.state ? ', ' : ''}
+                            {trackedOrder.shippingAddress.state}
+                            {trackedOrder.shippingAddress.zipCode && ` ${trackedOrder.shippingAddress.zipCode}`}
+                          </p>
+                        )}
+                        {trackedOrder.shippingAddress.phone && (
+                          <p>Phone: {trackedOrder.shippingAddress.phone}</p>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="bg-purple-500/10 border border-purple-500/20 rounded-lg p-6">
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div>
+                        <p className="text-xs font-semibold text-muted-foreground uppercase mb-2">Order Date</p>
+                        <p className="font-medium">
+                          {new Date(trackedOrder.createdAt).toLocaleDateString("en-IN")}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs font-semibold text-muted-foreground uppercase mb-2">Payment Method</p>
+                        <p className="font-medium">
+                          {trackedOrder.paymentMethod?.charAt(0).toUpperCase() + (trackedOrder.paymentMethod?.slice(1) || '')}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        );
 
       default:
         return (

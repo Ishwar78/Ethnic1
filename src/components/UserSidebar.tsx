@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { User, Package, Heart, ShoppingCart, Ticket, LogOut } from "lucide-react";
+import { User, Package, Heart, ShoppingCart, Ticket, LogOut, Truck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCart } from "@/contexts/CartContext";
@@ -26,6 +26,7 @@ export default function UserSidebar({ activeTab, onTabChange, onLogout }: UserSi
   const links: SidebarLink[] = [
     { title: "Profile", icon: User, tab: "profile" },
     { title: "My Orders", icon: Package, tab: "orders" },
+    { title: "Track Order", icon: Truck, tab: "track" },
     { title: "Wishlist", icon: Heart, tab: "wishlist", badge: wishlistItems },
     { title: "Cart", icon: ShoppingCart, tab: "cart", badge: cartItems },
     { title: "Support", icon: Ticket, tab: "support" },

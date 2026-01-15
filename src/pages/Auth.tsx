@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { Eye, EyeOff, Mail, Lock, User } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, User, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,6 +14,7 @@ import { z } from "zod";
 const emailSchema = z.string().email("Please enter a valid email address");
 const passwordSchema = z.string().min(6, "Password must be at least 6 characters");
 const nameSchema = z.string().min(2, "Name must be at least 2 characters").max(50, "Name must be less than 50 characters");
+const phoneSchema = z.string().min(10, "Phone number must be at least 10 characters");
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
@@ -22,7 +23,8 @@ export default function Auth() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
-  const [errors, setErrors] = useState<{ email?: string; password?: string; name?: string }>({});
+  const [phone, setPhone] = useState("");
+  const [errors, setErrors] = useState<{ email?: string; password?: string; name?: string; phone?: string }>({});
   
   const { user, login, signup } = useAuth();
   const navigate = useNavigate();
@@ -35,7 +37,7 @@ export default function Auth() {
   }, [user, navigate]);
 
   const validateForm = () => {
-    const newErrors: { email?: string; password?: string; name?: string } = {};
+    const newErrors: { email?: string; password?: string; name?: string; phone?: string } = {};
 
     const emailResult = emailSchema.safeParse(email);
     if (!emailResult.success) {
@@ -51,6 +53,11 @@ export default function Auth() {
       const nameResult = nameSchema.safeParse(name);
       if (!nameResult.success) {
         newErrors.name = nameResult.error.errors[0].message;
+      }
+
+      const phoneResult = phoneSchema.safeParse(phone);
+      if (!phoneResult.success) {
+        newErrors.phone = phoneResult.error.errors[0].message;
       }
     }
 
@@ -82,7 +89,7 @@ export default function Auth() {
           });
         }
       } else {
-        const result = await signup(email, password, name);
+        const result = await signup(email, password, name, phone);
         if (result.success) {
           toast({
             title: "Account created!",
@@ -111,6 +118,7 @@ export default function Auth() {
     setEmail("");
     setPassword("");
     setName("");
+    setPhone("");
   };
 
   return (
@@ -140,21 +148,39 @@ export default function Auth() {
 
               <form onSubmit={handleSubmit} className="space-y-5">
                 {!isLogin && (
-                  <div className="space-y-2">
-                    <Label htmlFor="name" className="text-foreground">Full Name</Label>
-                    <div className="relative">
-                      <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                      <Input
-                        id="name"
-                        type="text"
-                        placeholder="Your name"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        className="pl-10"
-                      />
+                  <>
+                    <div className="space-y-2">
+                      <Label htmlFor="name" className="text-foreground">Full Name</Label>
+                      <div className="relative">
+                        <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                        <Input
+                          id="name"
+                          type="text"
+                          placeholder="Your name"
+                          value={name}
+                          onChange={(e) => setName(e.target.value)}
+                          className="pl-10"
+                        />
+                      </div>
+                      {errors.name && <p className="text-sm text-destructive">{errors.name}</p>}
                     </div>
-                    {errors.name && <p className="text-sm text-destructive">{errors.name}</p>}
-                  </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="phone" className="text-foreground">Mobile Number *</Label>
+                      <div className="relative">
+                        <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                        <Input
+                          id="phone"
+                          type="tel"
+                          placeholder="+91 98765 43210"
+                          value={phone}
+                          onChange={(e) => setPhone(e.target.value)}
+                          className="pl-10"
+                        />
+                      </div>
+                      {errors.phone && <p className="text-sm text-destructive">{errors.phone}</p>}
+                    </div>
+                  </>
                 )}
 
                 <div className="space-y-2">

@@ -13,6 +13,17 @@ export interface User {
     zipCode?: string;
     country?: string;
   };
+  addresses?: Array<{
+    _id?: string;
+    label: string;
+    street?: string;
+    city?: string;
+    state?: string;
+    zipCode?: string;
+    country?: string;
+    phone?: string;
+    isDefault?: boolean;
+  }>;
   profileImage?: string;
   createdAt: string;
 }
@@ -22,7 +33,7 @@ interface AuthContextType {
   isLoading: boolean;
   token: string | null;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
-  signup: (email: string, password: string, name: string) => Promise<{ success: boolean; error?: string }>;
+  signup: (email: string, password: string, name: string, phone: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
   updateProfile: (data: Partial<User>) => Promise<{ success: boolean; error?: string }>;
 }
@@ -78,6 +89,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         role: data.user.role,
         phone: data.user.phone,
         address: data.user.address,
+        addresses: data.user.addresses,
         createdAt: data.user.createdAt,
       };
 
@@ -92,14 +104,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const signup = async (email: string, password: string, name: string): Promise<{ success: boolean; error?: string }> => {
+  const signup = async (email: string, password: string, name: string, phone: string): Promise<{ success: boolean; error?: string }> => {
     try {
       const response = await fetch(`${API_URL}/auth/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, password, name }),
+        body: JSON.stringify({ email, password, name, phone }),
       });
 
       const data = await response.json();
@@ -113,6 +125,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         email: data.user.email,
         name: data.user.name,
         role: data.user.role,
+        phone: data.user.phone,
         createdAt: data.user.createdAt,
       };
 

@@ -73,10 +73,22 @@ export default function Checkout() {
 
   // Fetch saved addresses from user profile
   useEffect(() => {
-    if (user && user.address) {
+    if (user) {
       const addresses: SavedAddress[] = [];
-      // Add user's primary address if it exists
-      if (user.address && (user.address.street || user.address.city)) {
+
+      // Load multiple addresses if available
+      if (user.addresses && user.addresses.length > 0) {
+        addresses.push(...user.addresses.map(addr => ({
+          street: addr.street || '',
+          city: addr.city || '',
+          state: addr.state || '',
+          zipCode: addr.zipCode || '',
+          country: addr.country || '',
+          phone: addr.phone || '',
+        })));
+      }
+      // Fallback to primary address if no multiple addresses exist
+      else if (user.address && (user.address.street || user.address.city)) {
         addresses.push({
           street: user.address.street || '',
           city: user.address.city || '',
@@ -86,6 +98,7 @@ export default function Checkout() {
           phone: user.phone || '',
         });
       }
+
       setSavedAddresses(addresses);
       if (addresses.length > 0) {
         setSelectedAddressIndex(0);
@@ -211,12 +224,14 @@ export default function Checkout() {
               'Authorization': `Bearer ${token}`,
             },
             body: JSON.stringify({
-              address: {
+              addAddress: {
+                label: `${shippingAddress.firstName || 'Home'}`,
                 street: shippingAddress.address,
                 city: shippingAddress.city,
                 state: shippingAddress.state,
                 zipCode: shippingAddress.pincode,
                 country: "India",
+                phone: shippingAddress.phone,
               },
               phone: shippingAddress.phone,
             }),

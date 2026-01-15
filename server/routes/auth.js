@@ -8,10 +8,14 @@ const router = express.Router();
 // Sign up
 router.post('/signup', async (req, res) => {
   try {
-    const { email, password, name } = req.body;
+    const { email, password, name, phone } = req.body;
 
     if (!email || !password || !name) {
       return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    if (!phone) {
+      return res.status(400).json({ error: 'Phone number is required' });
     }
 
     // Check if user already exists
@@ -28,7 +32,8 @@ router.post('/signup', async (req, res) => {
     const user = new User({
       name,
       email: email.toLowerCase(),
-      password: hashedPassword
+      password: hashedPassword,
+      phone
     });
 
     await user.save();
@@ -43,6 +48,7 @@ router.post('/signup', async (req, res) => {
         id: user._id,
         email: user.email,
         name: user.name,
+        phone: user.phone,
         role: user.role
       }
     });
@@ -85,7 +91,8 @@ router.post('/login', async (req, res) => {
         name: user.name,
         role: user.role,
         phone: user.phone,
-        address: user.address
+        address: user.address,
+        addresses: user.addresses
       }
     });
   } catch (error) {
@@ -98,7 +105,7 @@ router.post('/login', async (req, res) => {
 router.get('/me', authMiddleware, async (req, res) => {
   try {
     const user = await User.findById(req.userId).select('-password');
-    
+
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
@@ -112,6 +119,7 @@ router.get('/me', authMiddleware, async (req, res) => {
         role: user.role,
         phone: user.phone,
         address: user.address,
+        addresses: user.addresses,
         profileImage: user.profileImage,
         createdAt: user.createdAt
       }
@@ -125,13 +133,59 @@ router.get('/me', authMiddleware, async (req, res) => {
 // Update user profile
 router.put('/profile', authMiddleware, async (req, res) => {
   try {
-    const { name, phone, address } = req.body;
-    
-    const user = await User.findByIdAndUpdate(
-      req.userId,
-      { name, phone, address, updatedAt: new Date() },
-      { new: true }
-    ).select('-password');
+    const { name, phone, address, addresses, addAddress, updateAddressId, deleteAddressId } = req.body;
+
+    const user = await User.findById(req.userId);
+
+    // Update basic fields
+    if (name) user.name = name;
+    if (phone) user.phone = phone;
+    if (address) user.address = address;
+
+    // Handle adding a new address
+    if (addAddress) {
+      const newAddress = {
+        label: addAddress.label || 'Home',
+        street: addAddress.street,
+        city: addAddress.city,
+        state: addAddress.state,
+        zipCode: addAddress.zipCode,
+        country: addAddress.country || 'India',
+        phone: addAddress.phone,
+        isDefault: addAddress.isDefault || false
+      };
+
+      // If this is the default, unset other defaults
+      if (newAddress.isDefault) {
+        user.addresses.forEach(addr => addr.isDefault = false);
+      }
+
+      user.addresses.push(newAddress);
+    }
+
+    // Handle updating an address
+    if (updateAddressId) {
+      const addrIndex = user.addresses.findIndex(a => a._id.toString() === updateAddressId);
+      if (addrIndex !== -1) {
+        user.addresses[addrIndex] = {
+          ...user.addresses[addrIndex].toObject(),
+          ...req.body.updateAddress,
+        };
+      }
+    }
+
+    // Handle deleting an address
+    if (deleteAddressId) {
+      user.addresses = user.addresses.filter(a => a._id.toString() !== deleteAddressId);
+    }
+
+    // Replace all addresses if provided
+    if (addresses && Array.isArray(addresses)) {
+      user.addresses = addresses;
+    }
+
+    user.updatedAt = new Date();
+    await user.save();
 
     res.json({
       success: true,
@@ -142,6 +196,7 @@ router.put('/profile', authMiddleware, async (req, res) => {
         role: user.role,
         phone: user.phone,
         address: user.address,
+        addresses: user.addresses,
         createdAt: user.createdAt
       }
     });

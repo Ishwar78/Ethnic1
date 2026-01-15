@@ -23,6 +23,9 @@ interface Invoice {
     quantity: number;
     price: number;
     subtotal: number;
+    image?: string;
+    size?: string;
+    color?: string;
   }>;
   subtotal: number;
   taxAmount: number;
@@ -361,6 +364,8 @@ export default function InvoiceDisplay({ orderId, open, onOpenChange, token }: I
               <thead>
                 <tr>
                   <th>Item</th>
+                  <th>Size</th>
+                  <th>Color</th>
                   <th class="text-right">QTY</th>
                   <th class="text-right">Rate</th>
                   <th class="text-right">Amount</th>
@@ -370,6 +375,8 @@ export default function InvoiceDisplay({ orderId, open, onOpenChange, token }: I
                 ${inv.orderItems.map(item => `
                   <tr>
                     <td>${item.name}</td>
+                    <td>${item.size || '-'}</td>
+                    <td>${item.color || '-'}</td>
                     <td class="text-right">${item.quantity}</td>
                     <td class="text-right">₹${item.price.toFixed(2)}</td>
                     <td class="text-right">₹${item.subtotal.toFixed(2)}</td>
@@ -539,6 +546,8 @@ export default function InvoiceDisplay({ orderId, open, onOpenChange, token }: I
                   <thead>
                     <tr className="bg-muted/50">
                       <th className="text-left p-2 font-semibold">Item</th>
+                      <th className="text-left p-2 font-semibold w-20">Size</th>
+                      <th className="text-left p-2 font-semibold w-20">Color</th>
                       <th className="text-center p-2 font-semibold w-16">QTY</th>
                       <th className="text-right p-2 font-semibold w-24">Rate</th>
                       <th className="text-right p-2 font-semibold w-24">Amount</th>
@@ -547,7 +556,16 @@ export default function InvoiceDisplay({ orderId, open, onOpenChange, token }: I
                   <tbody>
                     {invoice.orderItems.map((item, idx) => (
                       <tr key={idx} className="border-b border-muted">
-                        <td className="p-2">{item.name}</td>
+                        <td className="p-2">
+                          <div className="flex items-center gap-2">
+                            {item.image && (
+                              <img src={item.image} alt={item.name} className="w-12 h-12 object-cover rounded" />
+                            )}
+                            <span>{item.name}</span>
+                          </div>
+                        </td>
+                        <td className="text-left p-2">{item.size || '-'}</td>
+                        <td className="text-left p-2">{item.color || '-'}</td>
                         <td className="text-center p-2">{item.quantity}</td>
                         <td className="text-right p-2">₹{item.price.toFixed(2)}</td>
                         <td className="text-right p-2">₹{item.subtotal.toFixed(2)}</td>
