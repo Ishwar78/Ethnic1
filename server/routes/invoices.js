@@ -61,7 +61,10 @@ router.post('/:orderId', authMiddleware, async (req, res) => {
         name: item.name,
         quantity: item.quantity,
         price: item.price,
-        subtotal: item.price * item.quantity
+        subtotal: item.price * item.quantity,
+        image: item.image || '',
+        size: item.size || '',
+        color: item.color || ''
       })),
       subtotal: order.totalAmount - (order.shipping || 0),
       taxAmount: 0,
