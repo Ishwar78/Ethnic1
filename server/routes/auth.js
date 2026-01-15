@@ -8,10 +8,14 @@ const router = express.Router();
 // Sign up
 router.post('/signup', async (req, res) => {
   try {
-    const { email, password, name } = req.body;
+    const { email, password, name, phone } = req.body;
 
     if (!email || !password || !name) {
       return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    if (!phone) {
+      return res.status(400).json({ error: 'Phone number is required' });
     }
 
     // Check if user already exists
@@ -28,7 +32,8 @@ router.post('/signup', async (req, res) => {
     const user = new User({
       name,
       email: email.toLowerCase(),
-      password: hashedPassword
+      password: hashedPassword,
+      phone
     });
 
     await user.save();
@@ -43,6 +48,7 @@ router.post('/signup', async (req, res) => {
         id: user._id,
         email: user.email,
         name: user.name,
+        phone: user.phone,
         role: user.role
       }
     });
