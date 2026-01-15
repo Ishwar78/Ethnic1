@@ -148,21 +148,39 @@ export default function Auth() {
 
               <form onSubmit={handleSubmit} className="space-y-5">
                 {!isLogin && (
-                  <div className="space-y-2">
-                    <Label htmlFor="name" className="text-foreground">Full Name</Label>
-                    <div className="relative">
-                      <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                      <Input
-                        id="name"
-                        type="text"
-                        placeholder="Your name"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        className="pl-10"
-                      />
+                  <>
+                    <div className="space-y-2">
+                      <Label htmlFor="name" className="text-foreground">Full Name</Label>
+                      <div className="relative">
+                        <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                        <Input
+                          id="name"
+                          type="text"
+                          placeholder="Your name"
+                          value={name}
+                          onChange={(e) => setName(e.target.value)}
+                          className="pl-10"
+                        />
+                      </div>
+                      {errors.name && <p className="text-sm text-destructive">{errors.name}</p>}
                     </div>
-                    {errors.name && <p className="text-sm text-destructive">{errors.name}</p>}
-                  </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="phone" className="text-foreground">Mobile Number *</Label>
+                      <div className="relative">
+                        <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                        <Input
+                          id="phone"
+                          type="tel"
+                          placeholder="+91 98765 43210"
+                          value={phone}
+                          onChange={(e) => setPhone(e.target.value)}
+                          className="pl-10"
+                        />
+                      </div>
+                      {errors.phone && <p className="text-sm text-destructive">{errors.phone}</p>}
+                    </div>
+                  </>
                 )}
 
                 <div className="space-y-2">
