@@ -89,7 +89,7 @@ export default function Auth() {
           });
         }
       } else {
-        const result = await signup(email, password, name);
+        const result = await signup(email, password, name, phone);
         if (result.success) {
           toast({
             title: "Account created!",
