@@ -224,12 +224,14 @@ export default function Checkout() {
               'Authorization': `Bearer ${token}`,
             },
             body: JSON.stringify({
-              address: {
+              addAddress: {
+                label: `${shippingAddress.firstName || 'Home'}`,
                 street: shippingAddress.address,
                 city: shippingAddress.city,
                 state: shippingAddress.state,
                 zipCode: shippingAddress.pincode,
                 country: "India",
+                phone: shippingAddress.phone,
               },
               phone: shippingAddress.phone,
             }),
