@@ -23,6 +23,9 @@ interface Invoice {
     quantity: number;
     price: number;
     subtotal: number;
+    image?: string;
+    size?: string;
+    color?: string;
   }>;
   subtotal: number;
   taxAmount: number;
