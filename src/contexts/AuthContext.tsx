@@ -92,14 +92,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const signup = async (email: string, password: string, name: string): Promise<{ success: boolean; error?: string }> => {
+  const signup = async (email: string, password: string, name: string, phone: string): Promise<{ success: boolean; error?: string }> => {
     try {
       const response = await fetch(`${API_URL}/auth/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, password, name }),
+        body: JSON.stringify({ email, password, name, phone }),
       });
 
       const data = await response.json();
@@ -113,6 +113,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         email: data.user.email,
         name: data.user.name,
         role: data.user.role,
+        phone: data.user.phone,
         createdAt: data.user.createdAt,
       };
 
