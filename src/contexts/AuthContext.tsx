@@ -89,6 +89,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         role: data.user.role,
         phone: data.user.phone,
         address: data.user.address,
+        addresses: data.user.addresses,
         createdAt: data.user.createdAt,
       };
 
