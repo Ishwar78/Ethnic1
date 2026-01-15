@@ -364,6 +364,8 @@ export default function InvoiceDisplay({ orderId, open, onOpenChange, token }: I
               <thead>
                 <tr>
                   <th>Item</th>
+                  <th>Size</th>
+                  <th>Color</th>
                   <th class="text-right">QTY</th>
                   <th class="text-right">Rate</th>
                   <th class="text-right">Amount</th>
@@ -373,6 +375,8 @@ export default function InvoiceDisplay({ orderId, open, onOpenChange, token }: I
                 ${inv.orderItems.map(item => `
                   <tr>
                     <td>${item.name}</td>
+                    <td>${item.size || '-'}</td>
+                    <td>${item.color || '-'}</td>
                     <td class="text-right">${item.quantity}</td>
                     <td class="text-right">₹${item.price.toFixed(2)}</td>
                     <td class="text-right">₹${item.subtotal.toFixed(2)}</td>
