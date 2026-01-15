@@ -13,6 +13,17 @@ export interface User {
     zipCode?: string;
     country?: string;
   };
+  addresses?: Array<{
+    _id?: string;
+    label: string;
+    street?: string;
+    city?: string;
+    state?: string;
+    zipCode?: string;
+    country?: string;
+    phone?: string;
+    isDefault?: boolean;
+  }>;
   profileImage?: string;
   createdAt: string;
 }
