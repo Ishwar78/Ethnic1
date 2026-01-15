@@ -131,13 +131,59 @@ router.get('/me', authMiddleware, async (req, res) => {
 // Update user profile
 router.put('/profile', authMiddleware, async (req, res) => {
   try {
-    const { name, phone, address } = req.body;
-    
-    const user = await User.findByIdAndUpdate(
-      req.userId,
-      { name, phone, address, updatedAt: new Date() },
-      { new: true }
-    ).select('-password');
+    const { name, phone, address, addresses, addAddress, updateAddressId, deleteAddressId } = req.body;
+
+    const user = await User.findById(req.userId);
+
+    // Update basic fields
+    if (name) user.name = name;
+    if (phone) user.phone = phone;
+    if (address) user.address = address;
+
+    // Handle adding a new address
+    if (addAddress) {
+      const newAddress = {
+        label: addAddress.label || 'Home',
+        street: addAddress.street,
+        city: addAddress.city,
+        state: addAddress.state,
+        zipCode: addAddress.zipCode,
+        country: addAddress.country || 'India',
+        phone: addAddress.phone,
+        isDefault: addAddress.isDefault || false
+      };
+
+      // If this is the default, unset other defaults
+      if (newAddress.isDefault) {
+        user.addresses.forEach(addr => addr.isDefault = false);
+      }
+
+      user.addresses.push(newAddress);
+    }
+
+    // Handle updating an address
+    if (updateAddressId) {
+      const addrIndex = user.addresses.findIndex(a => a._id.toString() === updateAddressId);
+      if (addrIndex !== -1) {
+        user.addresses[addrIndex] = {
+          ...user.addresses[addrIndex].toObject(),
+          ...req.body.updateAddress,
+        };
+      }
+    }
+
+    // Handle deleting an address
+    if (deleteAddressId) {
+      user.addresses = user.addresses.filter(a => a._id.toString() !== deleteAddressId);
+    }
+
+    // Replace all addresses if provided
+    if (addresses && Array.isArray(addresses)) {
+      user.addresses = addresses;
+    }
+
+    user.updatedAt = new Date();
+    await user.save();
 
     res.json({
       success: true,
@@ -148,6 +194,7 @@ router.put('/profile', authMiddleware, async (req, res) => {
         role: user.role,
         phone: user.phone,
         address: user.address,
+        addresses: user.addresses,
         createdAt: user.createdAt
       }
     });
