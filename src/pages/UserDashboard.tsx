@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { User, Mail, Phone, MapPin, Edit2, Save, X, Package, ShoppingBag, Calendar } from "lucide-react";
+import { User, Mail, Phone, MapPin, Edit2, Save, X, Package, ShoppingBag, Calendar, Search, Truck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
