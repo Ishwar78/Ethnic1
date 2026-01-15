@@ -1,0 +1,25 @@
+# Fly.io configuration for Vasstra Frontend
+app = "vasstra-frontend"
+primary_region = "iad"
+
+[build]
+  builder = "heroku"
+
+[env]
+  VITE_API_URL = "https://vasstra-backend.fly.dev/api"
+  NODE_ENV = "production"
+
+[processes]
+  app = "npm run build && npm run preview"
+
+[http_service]
+  internal_port = 4173
+  force_https = false
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 1
+
+[[vm]]
+  cpu_kind = "shared"
+  cpus = 1
+  memory_mb = 512

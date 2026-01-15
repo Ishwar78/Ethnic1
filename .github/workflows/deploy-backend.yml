@@ -1,0 +1,36 @@
+name: Deploy Backend to Fly.io
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'server/**'
+      - '.github/workflows/deploy-backend.yml'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Install Fly CLI
+        run: curl -L https://fly.io/install.sh | sh
+      
+      - name: Deploy to Fly.io
+        working-directory: ./server
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+        run: |
+          /root/.fly/bin/flyctl deploy --remote-only
+      
+      - name: Get Backend URL
+        id: get-url
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+        run: |
+          cd server
+          BACKEND_URL=$(/root/.fly/bin/flyctl info -j | grep -o '"Host":"[^"]*' | cut -d'"' -f4 | head -1)
+          echo "backend_url=https://$BACKEND_URL" >> $GITHUB_OUTPUT
+          echo "Backend deployed at: https://$BACKEND_URL"

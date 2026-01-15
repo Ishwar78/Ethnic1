@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Offline - Vasstra</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@400;500;600&display=swap');
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: linear-gradient(135deg, #f9f7f4 0%, #f0ebe4 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    
+    .container {
+      text-align: center;
+      max-width: 500px;
+    }
+    
+    .logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.5rem;
+      font-weight: 600;
+      color: #7a2139;
+      margin-bottom: 2rem;
+      letter-spacing: 0.1em;
+    }
+    
+    .logo span {
+      color: #c9a227;
+    }
+    
+    .icon {
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 2rem;
+      background: linear-gradient(135deg, #7a2139 0%, #5a1829 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 30px -8px rgba(122, 33, 57, 0.3);
+    }
+    
+    .icon svg {
+      width: 60px;
+      height: 60px;
+      stroke: #f9f7f4;
+      stroke-width: 1.5;
+      fill: none;
+    }
+    
+    h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.75rem;
+      color: #2d1f1f;
+      margin-bottom: 1rem;
+      font-weight: 600;
+    }
+    
+    p {
+      color: #6b5a5a;
+      line-height: 1.6;
+      margin-bottom: 2rem;
+    }
+    
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, #7a2139 0%, #5a1829 100%);
+      color: #f9f7f4;
+      padding: 14px 32px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px -8px rgba(122, 33, 57, 0.4);
+    }
+    
+    .btn svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      stroke-width: 2;
+      fill: none;
+    }
+    
+    .decorative-line {
+      width: 60px;
+      height: 2px;
+      background: linear-gradient(90deg, #c9a227, #d4af37);
+      margin: 0 auto 2rem;
+      border-radius: 1px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">VASSTRA<span>.</span></div>
+    
+    <div class="icon">
+      <svg viewBox="0 0 24 24">
+        <path d="M1 1l22 22M16.72 11.06A10.94 10.94 0 0119 12.55M5 12.55a10.94 10.94 0 015.17-2.39M10.71 5.05A16 16 0 0122.58 9M1.42 9a15.91 15.91 0 014.7-2.88M8.53 16.11a6 6 0 016.95 0M12 20h.01"/>
+      </svg>
+    </div>
+    
+    <div class="decorative-line"></div>
+    
+    <h1>You're Offline</h1>
+    
+    <p>
+      It looks like you've lost your internet connection. 
+      Please check your connection and try again to continue exploring our beautiful collection.
+    </p>
+    
+    <button class="btn" onclick="window.location.reload()">
+      <svg viewBox="0 0 24 24">
+        <path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>
+      </svg>
+      Try Again
+    </button>
+  </div>
+</body>
+</html>
