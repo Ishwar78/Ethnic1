@@ -91,7 +91,8 @@ router.post('/login', async (req, res) => {
         name: user.name,
         role: user.role,
         phone: user.phone,
-        address: user.address
+        address: user.address,
+        addresses: user.addresses
       }
     });
   } catch (error) {
