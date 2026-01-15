@@ -129,6 +129,35 @@ export default function UserDashboard() {
     navigate("/");
   };
 
+  const handleTrackOrder = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!trackingId.trim()) {
+      setTrackingError("Please enter a tracking ID");
+      return;
+    }
+
+    setIsTrackingLoading(true);
+    setTrackingError("");
+    setTrackedOrder(null);
+
+    try {
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+      const response = await fetch(`${API_URL}/orders/track/${encodeURIComponent(trackingId)}`);
+      const data = await response.json();
+
+      if (!response.ok) {
+        setTrackingError(data.error || "Order not found");
+        return;
+      }
+
+      setTrackedOrder(data.order);
+    } catch (error) {
+      setTrackingError("Failed to fetch order details");
+    } finally {
+      setIsTrackingLoading(false);
+    }
+  };
+
   // Show loading state while checking auth
   if (authLoading) {
     return (
