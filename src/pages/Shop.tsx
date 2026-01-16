@@ -135,7 +135,20 @@ export default function Shop() {
   }, []);
 
   const filteredProducts = products.filter((product) => {
-    if (selectedCategory !== "All" && product.category !== selectedCategory) return false;
+    // Filter by category
+    if (selectedCategory !== "All") {
+      // Check if product category matches selected category (case-insensitive)
+      const selectedCat = categories.find(c => c.name === selectedCategory || c.slug === selectedCategorySlug);
+      if (selectedCat) {
+        // Try to match by category name or slug
+        const productCategory = product.category?.toLowerCase() || '';
+        const catName = selectedCat.name?.toLowerCase() || '';
+        const catSlug = selectedCat.slug?.toLowerCase() || '';
+        if (!productCategory.includes(catName) && !productCategory.includes(catSlug)) {
+          return false;
+        }
+      }
+    }
     if (product.price < priceRange[0] || product.price > priceRange[1]) return false;
     if (selectedSizes.length > 0 && !selectedSizes.some((s) => product.sizes.includes(s))) return false;
     if (selectedColors.length > 0 && !selectedColors.some((c) => product.colors.includes(c))) return false;
