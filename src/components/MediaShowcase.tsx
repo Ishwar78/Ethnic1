@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import { ChevronLeft, ChevronRight, Heart, Eye, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { parseVideoSource, VideoType } from "@/lib/videoUtils";
 
 interface MediaItem {
   _id?: string;
@@ -128,6 +129,127 @@ const fallbackMediaItems: MediaItem[] = [
   }
 ];
 
+/**
+ * Video Player Component - Handles different video types
+ */
+interface VideoPlayerProps {
+  url: string;
+  isLoaded: boolean;
+  onLoad: () => void;
+  isHovered: boolean;
+}
+
+const VideoPlayer = ({ url, isLoaded, onLoad, isHovered }: VideoPlayerProps) => {
+  const videoSource = parseVideoSource(url);
+  const videoType = videoSource.type;
+
+  // For HTML5 videos - ensure autoplay when visible
+  if (videoType === 'html5') {
+    return (
+      <video
+        src={videoSource.directUrl}
+        autoPlay
+        loop
+        muted
+        playsInline
+        controls={false}
+        className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 ${
+          isLoaded ? "opacity-100" : "opacity-0"
+        }`}
+        onLoadedData={onLoad}
+        onCanPlay={onLoad}
+        onPlay={() => console.log('Video playing:', url)}
+        onError={(e) => console.error('Video error:', e)}
+      />
+    );
+  }
+
+  // For YouTube videos
+  if (videoType === 'youtube') {
+    return (
+      <iframe
+        src={videoSource.embedUrl}
+        title="YouTube Video"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowFullScreen
+        className={`w-full h-full transition-transform duration-500 group-hover:scale-105 ${
+          isLoaded ? "opacity-100" : "opacity-0"
+        }`}
+        onLoad={onLoad}
+        style={{
+          border: 'none',
+          borderRadius: '12px',
+        }}
+      />
+    );
+  }
+
+  // For Vimeo videos
+  if (videoType === 'vimeo') {
+    return (
+      <iframe
+        src={videoSource.embedUrl}
+        title="Vimeo Video"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowFullScreen
+        className={`w-full h-full transition-transform duration-500 group-hover:scale-105 ${
+          isLoaded ? "opacity-100" : "opacity-0"
+        }`}
+        onLoad={onLoad}
+        style={{
+          border: 'none',
+          borderRadius: '12px',
+        }}
+      />
+    );
+  }
+
+  // For Instagram (static display - no autoplay)
+  if (videoType === 'instagram') {
+    return (
+      <div className={`w-full h-full bg-gray-200 flex items-center justify-center rounded-lg ${
+        isLoaded ? "opacity-100" : "opacity-0"
+      }`}>
+        <div className="text-center">
+          <p className="text-sm text-gray-600 mb-2">Instagram Reel/Post</p>
+          <a
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 hover:underline text-xs"
+          >
+            Open on Instagram
+          </a>
+        </div>
+      </div>
+    );
+  }
+
+  // For TikTok (static display - no autoplay)
+  if (videoType === 'tiktok') {
+    return (
+      <div className={`w-full h-full bg-gray-200 flex items-center justify-center rounded-lg ${
+        isLoaded ? "opacity-100" : "opacity-0"
+      }`}>
+        <div className="text-center">
+          <p className="text-sm text-gray-600 mb-2">TikTok Video</p>
+          <a
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 hover:underline text-xs"
+          >
+            Open on TikTok
+          </a>
+        </div>
+      </div>
+    );
+  }
+
+  // Fallback
+  return <div className="w-full h-full bg-gray-300" />;
+};
+
 const MediaShowcase = () => {
   const [mediaItems, setMediaItems] = useState<MediaItem[]>(fallbackMediaItems);
   const [loadedItems, setLoadedItems] = useState<Set<number>>(new Set());
@@ -212,7 +334,7 @@ const MediaShowcase = () => {
     };
   }, [emblaApi, onSelect]);
 
-  // Auto-scroll
+  // Auto-scroll every 4 seconds
   useEffect(() => {
     if (!emblaApi) return;
     const interval = setInterval(() => {
@@ -286,16 +408,11 @@ const MediaShowcase = () => {
                         </div>
                       )}
                       
-                      <video
-                        src={item.url}
-                        autoPlay
-                        loop
-                        muted
-                        playsInline
-                        className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 ${
-                          loadedItems.has(index) ? "opacity-100" : "opacity-0"
-                        }`}
-                        onLoadedData={() => handleLoad(index)}
+                      <VideoPlayer
+                        url={item.url || ''}
+                        isLoaded={loadedItems.has(index)}
+                        onLoad={() => handleLoad(index)}
+                        isHovered={hoveredIndex === index}
                       />
                       
                       {/* Discount Badge */}
