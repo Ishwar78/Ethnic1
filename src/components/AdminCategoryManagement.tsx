@@ -430,15 +430,29 @@ const AdminCategoryManagement = () => {
                   className="flex items-center justify-between p-4 border rounded-lg"
                 >
                   <div className="flex items-center gap-4">
-                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                      category.parentId ? 'bg-muted' : 'bg-primary/10'
-                    }`}>
-                      {category.parentId ? (
-                        <Layers className="h-5 w-5 text-muted-foreground" />
-                      ) : (
-                        <FolderTree className="h-5 w-5 text-primary" />
-                      )}
-                    </div>
+                    {category.image ? (
+                      <div className="w-16 h-16 rounded-lg overflow-hidden border border-border bg-muted/50">
+                        <img
+                          src={category.image}
+                          alt={category.name}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                          }}
+                        />
+                      </div>
+                    ) : (
+                      <div className={`w-16 h-16 rounded-lg flex items-center justify-center ${
+                        category.parentId ? 'bg-muted' : 'bg-primary/10'
+                      }`}>
+                        {category.parentId ? (
+                          <Layers className="h-5 w-5 text-muted-foreground" />
+                        ) : (
+                          <FolderTree className="h-5 w-5 text-primary" />
+                        )}
+                      </div>
+                    )}
                     <div>
                       <div className="flex items-center gap-2">
                         <h3 className="font-medium">{category.name}</h3>
