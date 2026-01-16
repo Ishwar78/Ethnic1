@@ -408,6 +408,7 @@ export default function AdminDashboard() {
             <TabsList className="flex flex-wrap gap-1">
               <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="hero-media">Hero Slider</TabsTrigger>
+              <TabsTrigger value="videos">Trending Videos</TabsTrigger>
               <TabsTrigger value="products">Products</TabsTrigger>
               <TabsTrigger value="categories">Categories</TabsTrigger>
               <TabsTrigger value="coupons">Coupons</TabsTrigger>
