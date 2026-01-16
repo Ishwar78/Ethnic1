@@ -12,7 +12,7 @@ import { normalizeProduct } from "@/lib/normalizeProduct";
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
-const categories = ["All", "Ethnic Wear", "Western Wear"];
+const defaultCategories = ["All", "Ethnic Wear", "Western Wear"];
 const sizes = ["S", "M", "L", "XL", "XXL", "XXXL", "Free Size"];
 const colors = [
   { name: "Burgundy", hex: "#722F37" },
