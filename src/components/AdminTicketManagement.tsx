@@ -52,7 +52,7 @@ export default function AdminTicketManagement() {
   const [isLoading, setIsLoading] = useState(true);
   const [tickets, setTickets] = useState<SupportTicket[]>([]);
 
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+  const API_URL = import.meta.env.VITE_API_URL || '/api';
 
   // Fetch tickets from API
   useEffect(() => {
