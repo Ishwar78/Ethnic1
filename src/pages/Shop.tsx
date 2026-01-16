@@ -224,20 +224,41 @@ export default function Shop() {
                   <div className="mb-8">
                     <h4 className="font-medium mb-4">Category</h4>
                     <div className="space-y-2">
-                      {categories.map((cat) => (
-                        <button
-                          key={cat}
-                          onClick={() => setSelectedCategory(cat)}
-                          className={cn(
-                            "block w-full text-left px-3 py-2 rounded-md text-sm transition-colors",
-                            selectedCategory === cat
-                              ? "bg-primary text-primary-foreground"
-                              : "hover:bg-muted"
-                          )}
-                        >
-                          {cat}
-                        </button>
-                      ))}
+                      <button
+                        onClick={() => {
+                          setSelectedCategory("All");
+                          setSelectedCategorySlug(null);
+                        }}
+                        className={cn(
+                          "block w-full text-left px-3 py-2 rounded-md text-sm transition-colors",
+                          selectedCategory === "All"
+                            ? "bg-primary text-primary-foreground"
+                            : "hover:bg-muted"
+                        )}
+                      >
+                        All
+                      </button>
+                      {isCategoriesLoading ? (
+                        <div className="text-xs text-muted-foreground">Loading categories...</div>
+                      ) : (
+                        categories.map((cat) => (
+                          <button
+                            key={cat._id || cat.id}
+                            onClick={() => {
+                              setSelectedCategory(cat.name);
+                              setSelectedCategorySlug(cat.slug);
+                            }}
+                            className={cn(
+                              "block w-full text-left px-3 py-2 rounded-md text-sm transition-colors",
+                              (selectedCategory === cat.name || selectedCategorySlug === cat.slug)
+                                ? "bg-primary text-primary-foreground"
+                                : "hover:bg-muted"
+                            )}
+                          >
+                            {cat.name}
+                          </button>
+                        ))
+                      )}
                     </div>
                   </div>
 
