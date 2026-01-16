@@ -315,6 +315,7 @@ export default function Shop() {
                     onClick={() => {
                       setPriceRange([0, 20000]);
                       setSelectedCategory("All");
+                      setSelectedCategorySlug(null);
                       setSelectedSizes([]);
                       setSelectedColors([]);
                     }}
