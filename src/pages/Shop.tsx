@@ -66,6 +66,49 @@ export default function Shop() {
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState("featured");
 
+  // Fetch categories from API
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        setIsCategoriesLoading(true);
+        const response = await fetch(`${API_URL}/categories`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.categories && Array.isArray(data.categories)) {
+            setCategories(data.categories);
+          } else {
+            setCategories([]);
+          }
+        } else {
+          console.error('Failed to fetch categories');
+          setCategories([]);
+        }
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+        setCategories([]);
+      } finally {
+        setIsCategoriesLoading(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  // Handle category from URL parameter
+  useEffect(() => {
+    const categoryParam = searchParams.get('category');
+    if (categoryParam) {
+      setSelectedCategorySlug(categoryParam);
+      // Find the category name from slug
+      const category = categories.find(c => c.slug === categoryParam);
+      if (category) {
+        setSelectedCategory(category.name);
+      } else {
+        setSelectedCategory(categoryParam);
+      }
+    }
+  }, [searchParams, categories]);
+
   // Fetch products from API
   useEffect(() => {
     const fetchProducts = async () => {
