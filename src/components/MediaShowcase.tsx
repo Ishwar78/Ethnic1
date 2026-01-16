@@ -1,24 +1,27 @@
 import { useState, useCallback, useEffect } from "react";
 import useEmblaCarousel from "embla-carousel-react";
-import { ChevronLeft, ChevronRight, Heart, Eye } from "lucide-react";
+import { ChevronLeft, ChevronRight, Heart, Eye, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
 
 interface MediaItem {
-  type: "gif" | "video";
-  src: string;
+  _id?: string;
+  type?: "gif" | "video";
+  src?: string;
+  url?: string;
   category: string;
   title: string;
   price: number;
   originalPrice: number;
-  badge?: "NEW" | "BESTSELLER";
-  alt: string;
-  productId: number;
+  badge?: "NEW" | "BESTSELLER" | null;
+  alt?: string;
+  productId?: string | number;
 }
 
-const mediaItems: MediaItem[] = [
+// Fallback videos with external sources
+const fallbackMediaItems: MediaItem[] = [
   {
     type: "video",
-    src: "https://cdn.pixabay.com/video/2020/05/25/39755-425025485_large.mp4",
+    url: "https://cdn.pixabay.com/video/2020/05/25/39755-425025485_large.mp4",
     category: "FESTIVE",
     title: "Festive Special Dress",
     price: 7499,
@@ -28,7 +31,7 @@ const mediaItems: MediaItem[] = [
   },
   {
     type: "video",
-    src: "https://cdn.pixabay.com/video/2024/02/05/199394-909947976_large.mp4",
+    url: "https://cdn.pixabay.com/video/2024/02/05/199394-909947976_large.mp4",
     category: "LEHENGA",
     title: "Printed Chaniya Choli",
     price: 4999,
@@ -39,7 +42,7 @@ const mediaItems: MediaItem[] = [
   },
   {
     type: "video",
-    src: "https://cdn.pixabay.com/video/2021/10/17/92266-636313091_large.mp4",
+    url: "https://cdn.pixabay.com/video/2021/10/17/92266-636313091_large.mp4",
     category: "LEHENGA",
     title: "Silk Haldi Yellow Lehenga",
     price: 5499,
@@ -50,7 +53,7 @@ const mediaItems: MediaItem[] = [
   },
   {
     type: "video",
-    src: "https://cdn.pixabay.com/video/2020/09/06/49214-457117774_large.mp4",
+    url: "https://cdn.pixabay.com/video/2020/09/06/49214-457117774_large.mp4",
     category: "ETHNIC WEAR",
     title: "Embroidered Lehenga Set",
     price: 12999,
@@ -61,7 +64,7 @@ const mediaItems: MediaItem[] = [
   },
   {
     type: "video",
-    src: "https://cdn.pixabay.com/video/2019/09/14/27153-361227498_large.mp4",
+    url: "https://cdn.pixabay.com/video/2019/09/14/27153-361227498_large.mp4",
     category: "SAREE",
     title: "Elegant Silk Saree",
     price: 8999,
@@ -71,7 +74,7 @@ const mediaItems: MediaItem[] = [
   },
   {
     type: "video",
-    src: "https://cdn.pixabay.com/video/2020/07/30/46350-445823346_large.mp4",
+    url: "https://cdn.pixabay.com/video/2020/07/30/46350-445823346_large.mp4",
     category: "WESTERN",
     title: "Designer Gown Collection",
     price: 6999,
@@ -82,7 +85,7 @@ const mediaItems: MediaItem[] = [
   },
   {
     type: "video",
-    src: "https://cdn.pixabay.com/video/2016/09/19/5352-184025560_large.mp4",
+    url: "https://cdn.pixabay.com/video/2016/09/19/5352-184025560_large.mp4",
     category: "KURTA",
     title: "Embroidered Anarkali Kurta",
     price: 3999,
@@ -93,7 +96,7 @@ const mediaItems: MediaItem[] = [
   },
   {
     type: "video",
-    src: "https://cdn.pixabay.com/video/2020/06/09/41594-430315498_large.mp4",
+    url: "https://cdn.pixabay.com/video/2020/06/09/41594-430315498_large.mp4",
     category: "SAREE",
     title: "Banarasi Silk Saree",
     price: 15999,
@@ -104,7 +107,7 @@ const mediaItems: MediaItem[] = [
   },
   {
     type: "video",
-    src: "https://cdn.pixabay.com/video/2019/06/07/24195-341553322_large.mp4",
+    url: "https://cdn.pixabay.com/video/2019/06/07/24195-341553322_large.mp4",
     category: "TRADITIONAL",
     title: "Bridal Lehenga Collection",
     price: 24999,
@@ -114,7 +117,7 @@ const mediaItems: MediaItem[] = [
   },
   {
     type: "video",
-    src: "https://cdn.pixabay.com/video/2021/02/20/65897-514476498_large.mp4",
+    url: "https://cdn.pixabay.com/video/2021/02/20/65897-514476498_large.mp4",
     category: "ETHNIC WEAR",
     title: "Designer Salwar Suit",
     price: 4499,
@@ -126,8 +129,10 @@ const mediaItems: MediaItem[] = [
 ];
 
 const MediaShowcase = () => {
+  const [mediaItems, setMediaItems] = useState<MediaItem[]>(fallbackMediaItems);
   const [loadedItems, setLoadedItems] = useState<Set<number>>(new Set());
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [emblaRef, emblaApi] = useEmblaCarousel({ 
     loop: true,
     align: "start",
@@ -135,6 +140,51 @@ const MediaShowcase = () => {
     slidesToScroll: 1
   });
   const [selectedIndex, setSelectedIndex] = useState(0);
+
+  // Fetch videos from API
+  useEffect(() => {
+    fetchVideos();
+  }, []);
+
+  const fetchVideos = async () => {
+    try {
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+      const response = await fetch(`${API_URL}/videos`, {
+        headers: {
+          'Accept': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch videos');
+      }
+
+      const data = await response.json();
+      
+      if (data.videos && Array.isArray(data.videos) && data.videos.length > 0) {
+        // Transform API videos to match expected format
+        const transformedVideos = data.videos.map((video: any) => ({
+          _id: video._id,
+          type: "video",
+          url: video.url,
+          category: video.category,
+          title: video.title,
+          price: video.price,
+          originalPrice: video.originalPrice,
+          badge: video.badge || null,
+          alt: video.description || video.title,
+          productId: video.productId,
+        }));
+
+        setMediaItems(transformedVideos);
+      }
+    } catch (error) {
+      console.error('Error fetching videos:', error);
+      // Keep fallback videos on error
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleLoad = (index: number) => {
     setLoadedItems(prev => new Set([...prev, index]));
@@ -175,6 +225,29 @@ const MediaShowcase = () => {
     return Math.round(((original - current) / original) * 100);
   };
 
+  if (isLoading) {
+    return (
+      <section className="py-16 bg-[#f8f5f0] overflow-hidden">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <span className="text-primary font-medium tracking-widest text-sm uppercase mb-2 block">
+              Live Collection
+            </span>
+            <h2 className="font-display text-3xl md:text-5xl font-bold text-foreground mb-4">
+              Trending Ethnic Wear
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
+              Experience our stunning collection in motion
+            </p>
+          </div>
+          <div className="flex items-center justify-center py-20">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="py-16 bg-[#f8f5f0] overflow-hidden">
       <div className="container mx-auto px-4">
@@ -196,46 +269,34 @@ const MediaShowcase = () => {
             <div className="flex -ml-4">
               {mediaItems.map((item, index) => (
                 <div 
-                  key={index}
+                  key={item._id || index}
                   className="flex-[0_0_100%] sm:flex-[0_0_50%] lg:flex-[0_0_25%] min-w-0 pl-4"
                   onMouseEnter={() => setHoveredIndex(index)}
                   onMouseLeave={() => setHoveredIndex(null)}
                 >
                   <Link 
-                    to={`/product/${item.productId}`}
+                    to={`/product/${item.productId || 1}`}
                     className="bg-[#faf6f1] rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 group block"
                   >
                     {/* Media Container */}
-                    <div className="relative aspect-[3/4] overflow-hidden">
+                    <div className="relative aspect-[3/4] overflow-hidden bg-black">
                       {!loadedItems.has(index) && (
                         <div className="absolute inset-0 bg-[#f0ebe4] animate-pulse flex items-center justify-center z-10">
                           <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
                         </div>
                       )}
                       
-                      {item.type === "gif" ? (
-                        <img
-                          src={item.src}
-                          alt={item.alt}
-                          className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 ${
-                            loadedItems.has(index) ? "opacity-100" : "opacity-0"
-                          }`}
-                          onLoad={() => handleLoad(index)}
-                          loading="lazy"
-                        />
-                      ) : (
-                        <video
-                          src={item.src}
-                          autoPlay
-                          loop
-                          muted
-                          playsInline
-                          className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 ${
-                            loadedItems.has(index) ? "opacity-100" : "opacity-0"
-                          }`}
-                          onLoadedData={() => handleLoad(index)}
-                        />
-                      )}
+                      <video
+                        src={item.url}
+                        autoPlay
+                        loop
+                        muted
+                        playsInline
+                        className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 ${
+                          loadedItems.has(index) ? "opacity-100" : "opacity-0"
+                        }`}
+                        onLoadedData={() => handleLoad(index)}
+                      />
                       
                       {/* Discount Badge */}
                       <div className="absolute top-3 left-3 z-20">
@@ -300,44 +361,51 @@ const MediaShowcase = () => {
             </div>
           </div>
 
-          {/* Navigation Arrows */}
+          {/* Navigation Buttons */}
           <button
             onClick={scrollPrev}
-            className="absolute -left-2 md:-left-5 top-1/2 -translate-y-1/2 z-10 w-11 h-11 rounded-full bg-white shadow-lg flex items-center justify-center text-foreground hover:bg-primary hover:text-primary-foreground transition-all"
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-50 -translate-x-16 hidden lg:flex items-center justify-center w-10 h-10 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
             aria-label="Previous slide"
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
+
           <button
             onClick={scrollNext}
-            className="absolute -right-2 md:-right-5 top-1/2 -translate-y-1/2 z-10 w-11 h-11 rounded-full bg-white shadow-lg flex items-center justify-center text-foreground hover:bg-primary hover:text-primary-foreground transition-all"
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-50 translate-x-16 hidden lg:flex items-center justify-center w-10 h-10 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
             aria-label="Next slide"
           >
             <ChevronRight className="w-5 h-5" />
           </button>
+
+          {/* Dots Navigation */}
+          <div className="flex justify-center gap-2 mt-8">
+            {mediaItems.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => {
+                  if (emblaApi) {
+                    emblaApi.scrollSnapList().forEach((_, snapIndex) => {
+                      if (snapIndex === index) {
+                        emblaApi.scrollSnapList();
+                      }
+                    });
+                  }
+                }}
+                className={`w-2 h-2 rounded-full transition-colors ${
+                  index === selectedIndex ? "bg-primary" : "bg-primary/30"
+                }`}
+                aria-label={`Go to slide ${index + 1}`}
+              />
+            ))}
+          </div>
         </div>
 
-        {/* Dots */}
-        <div className="flex justify-center gap-2 mt-8">
-          {mediaItems.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => emblaApi?.scrollTo(index)}
-              className={`h-2 rounded-full transition-all ${
-                index === selectedIndex 
-                  ? "bg-primary w-6" 
-                  : "bg-muted-foreground/30 w-2 hover:bg-muted-foreground/50"
-              }`}
-              aria-label={`Go to slide ${index + 1}`}
-            />
-          ))}
-        </div>
-
-        {/* View All Button */}
-        <div className="text-center mt-10">
+        {/* CTA Link */}
+        <div className="flex justify-center mt-12">
           <Link
-            to="/ethnic-wear"
-            className="inline-flex items-center gap-2 px-8 py-4 bg-primary text-primary-foreground font-medium rounded-full hover:bg-primary/90 transition-all shadow-gold hover:shadow-lg hover:scale-105"
+            to="/shop"
+            className="inline-block px-8 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors"
           >
             View All Collection
           </Link>
