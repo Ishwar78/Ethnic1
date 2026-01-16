@@ -53,7 +53,7 @@ export default function HeroSlider() {
   const [isAnimating, setIsAnimating] = useState(false);
   const [slides, setSlides] = useState<HeroSlide[]>(defaultSlides);
 
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+  const API_URL = import.meta.env.VITE_API_URL || '/api';
 
   // Fetch hero media from API
   useEffect(() => {

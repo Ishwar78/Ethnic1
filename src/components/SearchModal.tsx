@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 import { Product } from "@/data/products";
 import { normalizeProduct } from "@/lib/normalizeProduct";
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_URL = import.meta.env.VITE_API_URL || '/api';
 
 interface SearchModalProps {
   isOpen: boolean;
