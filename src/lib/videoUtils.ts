@@ -206,3 +206,10 @@ export function supportsAutoplay(type: VideoType): boolean {
       return true;
   }
 }
+
+/**
+ * Alias for parseVideoSource for backward compatibility
+ */
+export function getVideoSource(url: string): VideoSource {
+  return parseVideoSource(url);
+}
