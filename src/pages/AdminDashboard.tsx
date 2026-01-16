@@ -25,6 +25,7 @@ import AdminBannerManagement from "@/components/AdminBannerManagement";
 import AdminCategoryManagement from "@/components/AdminCategoryManagement";
 import AdminCouponManagement from "@/components/AdminCouponManagement";
 import AdminHeroMediaManagement from "@/components/AdminHeroMediaManagement";
+import AdminVideoManagement from "@/components/AdminVideoManagement";
 import PaymentManagement from "@/components/PaymentManagement";
 import SizeChartManagement from "@/components/SizeChartManagement";
 import InvoiceDisplay from "@/components/InvoiceDisplay";
