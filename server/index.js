@@ -218,6 +218,7 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/hero-media', heroMediaRoutes);
 app.use('/api/products', productsRoutes);
 app.use('/api/categories', categoriesRoutes);
+app.use('/api/videos', videosRoutes);
 app.use('/api/tickets', ticketsRoutes);
 app.use('/api/coupons', couponsRoutes);
 app.use('/api/size-charts', sizeChartsRoutes);
