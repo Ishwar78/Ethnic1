@@ -328,13 +328,32 @@ const AdminCategoryManagement = () => {
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="image">Image URL</Label>
-                <Input
-                  id="image"
-                  value={formData.image}
-                  onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-                  placeholder="https://..."
-                />
+                <Label htmlFor="image">Category Image</Label>
+                <div className="space-y-3">
+                  <Input
+                    id="image"
+                    value={formData.image}
+                    onChange={(e) => setFormData({ ...formData, image: e.target.value })}
+                    placeholder="https://example.com/image.jpg"
+                    type="url"
+                  />
+                  {formData.image && (
+                    <div className="relative w-full h-40 rounded-lg overflow-hidden border border-border bg-muted/50">
+                      <img
+                        src={formData.image}
+                        alt="Category preview"
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = 'none';
+                        }}
+                      />
+                    </div>
+                  )}
+                  <p className="text-xs text-muted-foreground">
+                    Paste image URL (PNG, JPG, JPEG) - images will be displayed as circular collections
+                  </p>
+                </div>
               </div>
               
               <div className="flex items-center gap-2">
