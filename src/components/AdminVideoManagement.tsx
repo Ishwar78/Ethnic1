@@ -279,12 +279,15 @@ const AdminVideoManagement = () => {
                   id="url"
                   value={formData.url}
                   onChange={(e) => setFormData({ ...formData, url: e.target.value })}
-                  placeholder="https://..."
+                  placeholder="https://... (YouTube, Instagram, TikTok, Vimeo, or direct video link)"
                   type="url"
                   required
                 />
-                {formData.url && (
-                  <div className="relative w-full h-32 rounded-lg overflow-hidden border border-border bg-black">
+                <p className="text-xs text-muted-foreground mt-2">
+                  ✅ Supports: YouTube links • Instagram Reels/Posts • TikTok videos • Vimeo • Direct MP4/WebM links (Pixabay, Pexels, etc.)
+                </p>
+                {formData.url && formData.url.includes('mp4') && (
+                  <div className="relative w-full h-32 rounded-lg overflow-hidden border border-border bg-black mt-2">
                     <video
                       src={formData.url}
                       className="w-full h-full object-cover"
