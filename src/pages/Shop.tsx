@@ -54,11 +54,14 @@ interface Product {
 export default function Shop() {
   const [searchParams] = useSearchParams();
   const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isCategoriesLoading, setIsCategoriesLoading] = useState(true);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [gridCols, setGridCols] = useState<3 | 4>(4);
   const [priceRange, setPriceRange] = useState([0, 20000]);
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [selectedCategorySlug, setSelectedCategorySlug] = useState<string | null>(null);
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState("featured");
