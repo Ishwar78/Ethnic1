@@ -60,7 +60,7 @@ export default function InvoiceDisplay({ orderId, open, onOpenChange, token }: I
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+  const API_URL = import.meta.env.VITE_API_URL || '/api';
 
   useEffect(() => {
     if (open && orderId && token) {

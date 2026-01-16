@@ -11,7 +11,26 @@ router.get('/', async (req, res) => {
       .populate('parentId', 'name slug')
       .sort({ createdAt: 1 })
       .lean();
-    
+
+    res.json({
+      success: true,
+      categories,
+      total: categories.length,
+    });
+  } catch (error) {
+    console.error('Error fetching categories:', error);
+    res.status(500).json({ error: 'Failed to fetch categories' });
+  }
+});
+
+// Get all categories (admin - including inactive) - MUST BE BEFORE /:id
+router.get('/admin/all', authMiddleware, adminMiddleware, async (req, res) => {
+  try {
+    const categories = await Category.find()
+      .populate('parentId', 'name slug')
+      .sort({ createdAt: 1 })
+      .lean();
+
     res.json({
       success: true,
       categories,
@@ -29,11 +48,11 @@ router.get('/:id', async (req, res) => {
     const category = await Category.findById(req.params.id)
       .populate('parentId', 'name slug')
       .lean();
-    
+
     if (!category) {
       return res.status(404).json({ error: 'Category not found' });
     }
-    
+
     res.json({
       success: true,
       category,
@@ -41,25 +60,6 @@ router.get('/:id', async (req, res) => {
   } catch (error) {
     console.error('Error fetching category:', error);
     res.status(500).json({ error: 'Failed to fetch category' });
-  }
-});
-
-// Get all categories (admin - including inactive)
-router.get('/admin/all', authMiddleware, adminMiddleware, async (req, res) => {
-  try {
-    const categories = await Category.find()
-      .populate('parentId', 'name slug')
-      .sort({ createdAt: 1 })
-      .lean();
-    
-    res.json({
-      success: true,
-      categories,
-      total: categories.length,
-    });
-  } catch (error) {
-    console.error('Error fetching categories:', error);
-    res.status(500).json({ error: 'Failed to fetch categories' });
   }
 });
 

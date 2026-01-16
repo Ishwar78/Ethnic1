@@ -45,7 +45,7 @@ export default function AdminHeroMediaManagement() {
   const [mediaPreview, setMediaPreview] = useState<string | null>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
 
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+  const API_URL = import.meta.env.VITE_API_URL || '/api';
 
   // Fetch media
   const fetchMedia = async () => {

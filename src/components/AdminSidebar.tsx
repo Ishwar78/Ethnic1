@@ -87,7 +87,7 @@ export default function AdminSidebar() {
   const location = useLocation();
   const { token } = useAuth();
 
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+  const API_URL = import.meta.env.VITE_API_URL || '/api';
 
   // Fetch new orders count (confirmed status)
   useEffect(() => {

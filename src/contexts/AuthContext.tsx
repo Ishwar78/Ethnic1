@@ -40,7 +40,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_URL = import.meta.env.VITE_API_URL || '/api';
 const AUTH_STORAGE_KEY = "vasstra_auth_token";
 const USER_STORAGE_KEY = "vasstra_auth_user";
 
