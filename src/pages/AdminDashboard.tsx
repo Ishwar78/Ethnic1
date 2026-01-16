@@ -25,6 +25,7 @@ import AdminBannerManagement from "@/components/AdminBannerManagement";
 import AdminCategoryManagement from "@/components/AdminCategoryManagement";
 import AdminCouponManagement from "@/components/AdminCouponManagement";
 import AdminHeroMediaManagement from "@/components/AdminHeroMediaManagement";
+import AdminVideoManagement from "@/components/AdminVideoManagement";
 import PaymentManagement from "@/components/PaymentManagement";
 import SizeChartManagement from "@/components/SizeChartManagement";
 import InvoiceDisplay from "@/components/InvoiceDisplay";
@@ -407,6 +408,7 @@ export default function AdminDashboard() {
             <TabsList className="flex flex-wrap gap-1">
               <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="hero-media">Hero Slider</TabsTrigger>
+              <TabsTrigger value="videos">Trending Videos</TabsTrigger>
               <TabsTrigger value="products">Products</TabsTrigger>
               <TabsTrigger value="categories">Categories</TabsTrigger>
               <TabsTrigger value="coupons">Coupons</TabsTrigger>
@@ -475,6 +477,11 @@ export default function AdminDashboard() {
             {/* Hero Media Tab */}
             <TabsContent value="hero-media" className="space-y-6">
               <AdminHeroMediaManagement />
+            </TabsContent>
+
+            {/* Videos Tab */}
+            <TabsContent value="videos" className="space-y-6">
+              <AdminVideoManagement />
             </TabsContent>
 
             {/* Products Tab */}

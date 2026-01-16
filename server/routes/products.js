@@ -58,6 +58,22 @@ router.get('/', async (req, res) => {
   }
 });
 
+// Get all products (admin - including inactive)
+router.get('/admin/all', authMiddleware, adminMiddleware, async (req, res) => {
+  try {
+    const products = await Product.find().lean();
+
+    res.json({
+      success: true,
+      products,
+      total: products.length,
+    });
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    res.status(500).json({ error: 'Failed to fetch products' });
+  }
+});
+
 // Get single product by slug (public)
 router.get('/slug/:slug', async (req, res) => {
   try {
@@ -93,22 +109,6 @@ router.get('/:id', async (req, res) => {
   } catch (error) {
     console.error('Error fetching product:', error);
     res.status(500).json({ error: 'Failed to fetch product' });
-  }
-});
-
-// Get all products (admin - including inactive)
-router.get('/admin/all', authMiddleware, adminMiddleware, async (req, res) => {
-  try {
-    const products = await Product.find().lean();
-    
-    res.json({
-      success: true,
-      products,
-      total: products.length,
-    });
-  } catch (error) {
-    console.error('Error fetching products:', error);
-    res.status(500).json({ error: 'Failed to fetch products' });
   }
 });
 

@@ -328,13 +328,32 @@ const AdminCategoryManagement = () => {
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="image">Image URL</Label>
-                <Input
-                  id="image"
-                  value={formData.image}
-                  onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-                  placeholder="https://..."
-                />
+                <Label htmlFor="image">Category Image</Label>
+                <div className="space-y-3">
+                  <Input
+                    id="image"
+                    value={formData.image}
+                    onChange={(e) => setFormData({ ...formData, image: e.target.value })}
+                    placeholder="https://example.com/image.jpg"
+                    type="url"
+                  />
+                  {formData.image && (
+                    <div className="relative w-full h-40 rounded-lg overflow-hidden border border-border bg-muted/50">
+                      <img
+                        src={formData.image}
+                        alt="Category preview"
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = 'none';
+                        }}
+                      />
+                    </div>
+                  )}
+                  <p className="text-xs text-muted-foreground">
+                    Paste image URL (PNG, JPG, JPEG) - images will be displayed as circular collections
+                  </p>
+                </div>
               </div>
               
               <div className="flex items-center gap-2">
@@ -411,15 +430,29 @@ const AdminCategoryManagement = () => {
                   className="flex items-center justify-between p-4 border rounded-lg"
                 >
                   <div className="flex items-center gap-4">
-                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                      category.parentId ? 'bg-muted' : 'bg-primary/10'
-                    }`}>
-                      {category.parentId ? (
-                        <Layers className="h-5 w-5 text-muted-foreground" />
-                      ) : (
-                        <FolderTree className="h-5 w-5 text-primary" />
-                      )}
-                    </div>
+                    {category.image ? (
+                      <div className="w-16 h-16 rounded-lg overflow-hidden border border-border bg-muted/50">
+                        <img
+                          src={category.image}
+                          alt={category.name}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                          }}
+                        />
+                      </div>
+                    ) : (
+                      <div className={`w-16 h-16 rounded-lg flex items-center justify-center ${
+                        category.parentId ? 'bg-muted' : 'bg-primary/10'
+                      }`}>
+                        {category.parentId ? (
+                          <Layers className="h-5 w-5 text-muted-foreground" />
+                        ) : (
+                          <FolderTree className="h-5 w-5 text-primary" />
+                        )}
+                      </div>
+                    )}
                     <div>
                       <div className="flex items-center gap-2">
                         <h3 className="font-medium">{category.name}</h3>

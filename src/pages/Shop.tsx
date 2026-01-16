@@ -12,7 +12,7 @@ import { normalizeProduct } from "@/lib/normalizeProduct";
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
-const categories = ["All", "Ethnic Wear", "Western Wear"];
+const defaultCategories = ["All", "Ethnic Wear", "Western Wear"];
 const sizes = ["S", "M", "L", "XL", "XXL", "XXXL", "Free Size"];
 const colors = [
   { name: "Burgundy", hex: "#722F37" },
@@ -54,14 +54,60 @@ interface Product {
 export default function Shop() {
   const [searchParams] = useSearchParams();
   const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isCategoriesLoading, setIsCategoriesLoading] = useState(true);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [gridCols, setGridCols] = useState<3 | 4>(4);
   const [priceRange, setPriceRange] = useState([0, 20000]);
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [selectedCategorySlug, setSelectedCategorySlug] = useState<string | null>(null);
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState("featured");
+
+  // Fetch categories from API
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        setIsCategoriesLoading(true);
+        const response = await fetch(`${API_URL}/categories`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.categories && Array.isArray(data.categories)) {
+            setCategories(data.categories);
+          } else {
+            setCategories([]);
+          }
+        } else {
+          console.error('Failed to fetch categories');
+          setCategories([]);
+        }
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+        setCategories([]);
+      } finally {
+        setIsCategoriesLoading(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  // Handle category from URL parameter
+  useEffect(() => {
+    const categoryParam = searchParams.get('category');
+    if (categoryParam) {
+      setSelectedCategorySlug(categoryParam);
+      // Find the category name from slug
+      const category = categories.find(c => c.slug === categoryParam);
+      if (category) {
+        setSelectedCategory(category.name);
+      } else {
+        setSelectedCategory(categoryParam);
+      }
+    }
+  }, [searchParams, categories]);
 
   // Fetch products from API
   useEffect(() => {
@@ -89,7 +135,20 @@ export default function Shop() {
   }, []);
 
   const filteredProducts = products.filter((product) => {
-    if (selectedCategory !== "All" && product.category !== selectedCategory) return false;
+    // Filter by category
+    if (selectedCategory !== "All") {
+      // Check if product category matches selected category (case-insensitive)
+      const selectedCat = categories.find(c => c.name === selectedCategory || c.slug === selectedCategorySlug);
+      if (selectedCat) {
+        // Try to match by category name or slug
+        const productCategory = product.category?.toLowerCase() || '';
+        const catName = selectedCat.name?.toLowerCase() || '';
+        const catSlug = selectedCat.slug?.toLowerCase() || '';
+        if (!productCategory.includes(catName) && !productCategory.includes(catSlug)) {
+          return false;
+        }
+      }
+    }
     if (product.price < priceRange[0] || product.price > priceRange[1]) return false;
     if (selectedSizes.length > 0 && !selectedSizes.some((s) => product.sizes.includes(s))) return false;
     if (selectedColors.length > 0 && !selectedColors.some((c) => product.colors.includes(c))) return false;
@@ -165,20 +224,41 @@ export default function Shop() {
                   <div className="mb-8">
                     <h4 className="font-medium mb-4">Category</h4>
                     <div className="space-y-2">
-                      {categories.map((cat) => (
-                        <button
-                          key={cat}
-                          onClick={() => setSelectedCategory(cat)}
-                          className={cn(
-                            "block w-full text-left px-3 py-2 rounded-md text-sm transition-colors",
-                            selectedCategory === cat
-                              ? "bg-primary text-primary-foreground"
-                              : "hover:bg-muted"
-                          )}
-                        >
-                          {cat}
-                        </button>
-                      ))}
+                      <button
+                        onClick={() => {
+                          setSelectedCategory("All");
+                          setSelectedCategorySlug(null);
+                        }}
+                        className={cn(
+                          "block w-full text-left px-3 py-2 rounded-md text-sm transition-colors",
+                          selectedCategory === "All"
+                            ? "bg-primary text-primary-foreground"
+                            : "hover:bg-muted"
+                        )}
+                      >
+                        All
+                      </button>
+                      {isCategoriesLoading ? (
+                        <div className="text-xs text-muted-foreground">Loading categories...</div>
+                      ) : (
+                        categories.map((cat) => (
+                          <button
+                            key={cat._id || cat.id}
+                            onClick={() => {
+                              setSelectedCategory(cat.name);
+                              setSelectedCategorySlug(cat.slug);
+                            }}
+                            className={cn(
+                              "block w-full text-left px-3 py-2 rounded-md text-sm transition-colors",
+                              (selectedCategory === cat.name || selectedCategorySlug === cat.slug)
+                                ? "bg-primary text-primary-foreground"
+                                : "hover:bg-muted"
+                            )}
+                          >
+                            {cat.name}
+                          </button>
+                        ))
+                      )}
                     </div>
                   </div>
 
@@ -235,6 +315,7 @@ export default function Shop() {
                     onClick={() => {
                       setPriceRange([0, 20000]);
                       setSelectedCategory("All");
+                      setSelectedCategorySlug(null);
                       setSelectedSizes([]);
                       setSelectedColors([]);
                     }}

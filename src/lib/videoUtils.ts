@@ -1,81 +1,208 @@
 /**
- * Extracts video ID from YouTube URL and returns embed URL
+ * Utility functions for handling different video sources
+ * Supports: HTML5 videos, YouTube, Instagram Reels, TikTok, etc.
  */
-export function getYouTubeEmbedUrl(url: string): string | null {
-  try {
-    // Handle youtu.be short URLs
-    const shortMatch = url.match(/youtu\.be\/([a-zA-Z0-9_-]{11})/);
-    if (shortMatch) return `https://www.youtube.com/embed/${shortMatch[1]}?autoplay=1&mute=1`;
 
-    // Handle youtube.com URLs with watch?v=
-    const watchMatch = url.match(/youtube\.com\/watch\?v=([a-zA-Z0-9_-]{11})/);
-    if (watchMatch) return `https://www.youtube.com/embed/${watchMatch[1]}?autoplay=1&mute=1`;
+export type VideoType = 'html5' | 'youtube' | 'instagram' | 'tiktok' | 'vimeo' | 'unknown';
 
-    // Handle already embed URLs
-    if (url.includes('youtube.com/embed/')) {
-      return url.includes('autoplay=1') ? url : url + (url.includes('?') ? '&' : '?') + 'autoplay=1&mute=1';
+export interface VideoSource {
+  type: VideoType;
+  embedUrl?: string;
+  directUrl?: string;
+  videoId?: string;
+}
+
+/**
+ * Extract YouTube video ID from various URL formats
+ * Supports: youtube.com/watch?v=..., youtu.be/..., youtube.com/embed/...
+ */
+export function extractYouTubeId(url: string): string | null {
+  if (!url) return null;
+
+  const patterns = [
+    /(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/,
+    /youtube\.com\/embed\/([a-zA-Z0-9_-]{11})/,
+    /youtube\.com\/v\/([a-zA-Z0-9_-]{11})/,
+  ];
+
+  for (const pattern of patterns) {
+    const match = url.match(pattern);
+    if (match && match[1]) {
+      return match[1];
     }
-
-    return null;
-  } catch (error) {
-    console.error('Error parsing YouTube URL:', error);
-    return null;
   }
+
+  return null;
 }
 
 /**
- * Extracts video ID from Instagram URL and returns embed URL
+ * Extract Instagram Reel/Post ID from URL
+ * Supports: instagram.com/reel/..., instagram.com/p/...
  */
-export function getInstagramEmbedUrl(url: string): string | null {
-  try {
-    // Handle instagram.com/p/ (posts) and /reel/ (reels)
-    const postMatch = url.match(/instagram\.com\/(p|reel)\/([a-zA-Z0-9_-]+)\/?/);
-    if (postMatch) {
-      const postId = postMatch[2];
-      return `https://www.instagram.com/${postMatch[1]}/${postId}/embed/caption/?cr=1&v=14`;
+export function extractInstagramId(url: string): string | null {
+  if (!url) return null;
+
+  const patterns = [
+    /instagram\.com\/(reel|p)\/([a-zA-Z0-9_-]+)/,
+  ];
+
+  for (const pattern of patterns) {
+    const match = url.match(pattern);
+    if (match && match[2]) {
+      return match[2];
     }
-
-    return null;
-  } catch (error) {
-    console.error('Error parsing Instagram URL:', error);
-    return null;
   }
+
+  return null;
 }
 
 /**
- * Determines the video source type and returns appropriate embed/direct URL
+ * Extract TikTok video ID from URL
+ * Supports: tiktok.com/@.../video/..., vm.tiktok.com/...
  */
-export function getVideoSource(url: string): {
-  type: 'youtube' | 'instagram' | 'direct' | 'unknown';
-  src: string;
-} {
-  if (!url) return { type: 'unknown', src: '' };
+export function extractTikTokId(url: string): string | null {
+  if (!url) return null;
 
-  // Check for YouTube
-  if (url.includes('youtube.com') || url.includes('youtu.be')) {
-    const embedUrl = getYouTubeEmbedUrl(url);
-    if (embedUrl) return { type: 'youtube', src: embedUrl };
+  const patterns = [
+    /tiktok\.com\/.*\/video\/(\d+)/,
+    /vm\.tiktok\.com\/([a-zA-Z0-9]+)/,
+    /vt\.tiktok\.com\/([a-zA-Z0-9]+)/,
+  ];
+
+  for (const pattern of patterns) {
+    const match = url.match(pattern);
+    if (match && match[1]) {
+      return match[1];
+    }
   }
 
-  // Check for Instagram
-  if (url.includes('instagram.com')) {
-    const embedUrl = getInstagramEmbedUrl(url);
-    if (embedUrl) return { type: 'instagram', src: embedUrl };
-  }
-
-  // Direct video URL
-  if (url.match(/\.(mp4|webm|ogg)$/i)) {
-    return { type: 'direct', src: url };
-  }
-
-  // Assume direct URL if no pattern matches
-  return { type: 'direct', src: url };
+  return null;
 }
 
 /**
- * Checks if URL is a valid video source
+ * Extract Vimeo video ID from URL
+ * Supports: vimeo.com/..., player.vimeo.com/video/...
  */
-export function isValidVideoUrl(url: string): boolean {
-  const source = getVideoSource(url);
-  return source.type !== 'unknown';
+export function extractVimeoId(url: string): string | null {
+  if (!url) return null;
+
+  const patterns = [
+    /vimeo\.com\/(\d+)/,
+    /player\.vimeo\.com\/video\/(\d+)/,
+  ];
+
+  for (const pattern of patterns) {
+    const match = url.match(pattern);
+    if (match && match[1]) {
+      return match[1];
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Detect video type from URL
+ */
+export function detectVideoType(url: string): VideoType {
+  if (!url) return 'unknown';
+
+  const lowerUrl = url.toLowerCase();
+
+  if (lowerUrl.includes('youtube.com') || lowerUrl.includes('youtu.be')) {
+    return 'youtube';
+  }
+
+  if (lowerUrl.includes('instagram.com')) {
+    return 'instagram';
+  }
+
+  if (lowerUrl.includes('tiktok.com') || lowerUrl.includes('vm.tiktok.com') || lowerUrl.includes('vt.tiktok.com')) {
+    return 'tiktok';
+  }
+
+  if (lowerUrl.includes('vimeo.com') || lowerUrl.includes('player.vimeo.com')) {
+    return 'vimeo';
+  }
+
+  // Check if it's a direct video URL
+  if (
+    lowerUrl.endsWith('.mp4') ||
+    lowerUrl.endsWith('.webm') ||
+    lowerUrl.endsWith('.ogg') ||
+    lowerUrl.endsWith('.mov') ||
+    lowerUrl.includes('video') ||
+    lowerUrl.includes('pixabay') ||
+    lowerUrl.includes('pexels')
+  ) {
+    return 'html5';
+  }
+
+  return 'html5'; // Default to html5 for unknown URLs
+}
+
+/**
+ * Get video source details from URL
+ */
+export function parseVideoSource(url: string): VideoSource {
+  const type = detectVideoType(url);
+
+  const source: VideoSource = {
+    type,
+    directUrl: url,
+  };
+
+  switch (type) {
+    case 'youtube':
+      source.videoId = extractYouTubeId(url) || undefined;
+      if (source.videoId) {
+        source.embedUrl = `https://www.youtube.com/embed/${source.videoId}?autoplay=1&mute=1&controls=1&modestbranding=1`;
+      }
+      break;
+
+    case 'instagram':
+      source.videoId = extractInstagramId(url) || undefined;
+      if (source.videoId) {
+        source.embedUrl = `https://www.instagram.com/p/${source.videoId}/embed`;
+      }
+      break;
+
+    case 'vimeo':
+      source.videoId = extractVimeoId(url) || undefined;
+      if (source.videoId) {
+        source.embedUrl = `https://player.vimeo.com/video/${source.videoId}?autoplay=1&mute=1`;
+      }
+      break;
+
+    case 'tiktok':
+      source.videoId = extractTikTokId(url) || undefined;
+      if (source.videoId) {
+        source.embedUrl = `https://www.tiktok.com/embed/v2/${source.videoId}`;
+      }
+      break;
+
+    case 'html5':
+    default:
+      // For HTML5 videos, use the direct URL
+      source.embedUrl = url;
+      break;
+  }
+
+  return source;
+}
+
+/**
+ * Check if a video source supports autoplay
+ */
+export function supportsAutoplay(type: VideoType): boolean {
+  // HTML5 videos support autoplay if muted
+  // YouTube, Vimeo support autoplay with parameters
+  // Instagram, TikTok don't support direct autoplay
+  switch (type) {
+    case 'instagram':
+    case 'tiktok':
+      return false;
+    default:
+      return true;
+  }
 }
