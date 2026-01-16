@@ -141,7 +141,7 @@ export default function UserDashboard() {
     setTrackedOrder(null);
 
     try {
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+      const API_URL = import.meta.env.VITE_API_URL || '/api';
       const response = await fetch(`${API_URL}/orders/track/${encodeURIComponent(trackingId)}`);
       const data = await response.json();
 
