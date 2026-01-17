@@ -197,8 +197,11 @@ export default function Checkout() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // Transaction ID is optional for both COD and UPI
-    // No validation required for transaction IDs
+    // Validate transaction ID for UPI payments - it's now mandatory
+    if (paymentMethod === 'upi' && !upiTransactionId.trim()) {
+      toast.error("Please enter your UPI transaction ID");
+      return;
+    }
 
     setIsProcessing(true);
 
