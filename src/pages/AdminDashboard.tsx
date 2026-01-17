@@ -425,24 +425,70 @@ export default function AdminDashboard() {
             <p className="text-muted-foreground">Manage users, orders, and view statistics</p>
           </div>
 
-          <Tabs value={currentTab} className="space-y-6" onValueChange={handleTabChange}>
-            <TabsList className="flex flex-wrap gap-1">
-              <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="hero-media">Hero Slider</TabsTrigger>
-              <TabsTrigger value="videos">Trending Videos</TabsTrigger>
-              <TabsTrigger value="products">Products</TabsTrigger>
-              <TabsTrigger value="categories">Categories</TabsTrigger>
-              <TabsTrigger value="coupons">Coupons</TabsTrigger>
-              <TabsTrigger value="banners">Banners</TabsTrigger>
-              <TabsTrigger value="payments">Payments</TabsTrigger>
-              <TabsTrigger value="invoices">Invoices</TabsTrigger>
-              <TabsTrigger value="size-charts">Size Charts</TabsTrigger>
-              <TabsTrigger value="users">Users</TabsTrigger>
-              <TabsTrigger value="orders">Orders</TabsTrigger>
-              <TabsTrigger value="tickets">Tickets</TabsTrigger>
-              <TabsTrigger value="contact">Contact</TabsTrigger>
-              <TabsTrigger value="settings">Settings</TabsTrigger>
-            </TabsList>
+          <Tabs value={currentTab} className="space-y-6" onValueChange={(value) => {
+            handleTabChange(value);
+            setIsMobileMenuOpen(false);
+          }}>
+            {/* Desktop Tabs - Horizontal Scroll on Mobile */}
+            <div className="relative">
+              {/* Mobile Menu Button */}
+              <div className="flex lg:hidden mb-4">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                  className="w-full justify-between"
+                >
+                  <span>
+                    {tabs.find(t => t.value === currentTab)?.label || 'Select Tab'}
+                  </span>
+                  <ChevronDown className={`h-4 w-4 transition-transform ${isMobileMenuOpen ? 'rotate-180' : ''}`} />
+                </Button>
+              </div>
+
+              {/* Mobile Dropdown Menu */}
+              {isMobileMenuOpen && (
+                <div className="lg:hidden absolute top-full left-0 right-0 z-50 mt-2 bg-white border border-border rounded-lg shadow-lg overflow-hidden">
+                  <div className="max-h-96 overflow-y-auto">
+                    {tabs.map((tab) => (
+                      <button
+                        key={tab.value}
+                        onClick={() => handleTabChange(tab.value)}
+                        className={`w-full text-left px-4 py-3 text-sm hover:bg-muted transition-colors ${
+                          currentTab === tab.value
+                            ? 'bg-primary text-primary-foreground font-medium'
+                            : 'text-foreground'
+                        }`}
+                      >
+                        {tab.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Desktop Tabs - Horizontal Scrollable on Mobile */}
+              <div className="hidden lg:block overflow-x-auto">
+                <TabsList className="inline-flex gap-1 bg-transparent p-0">
+                  {tabs.map((tab) => (
+                    <TabsTrigger key={tab.value} value={tab.value} className="text-xs md:text-sm whitespace-nowrap">
+                      {tab.label}
+                    </TabsTrigger>
+                  ))}
+                </TabsList>
+              </div>
+
+              {/* Fallback scrollable tabs for mobile */}
+              <div className="lg:hidden overflow-x-auto -mx-6 px-6">
+                <TabsList className="inline-flex gap-1 bg-transparent p-0 w-max">
+                  {tabs.map((tab) => (
+                    <TabsTrigger key={tab.value} value={tab.value} className="text-xs whitespace-nowrap">
+                      {tab.label}
+                    </TabsTrigger>
+                  ))}
+                </TabsList>
+              </div>
+            </div>
 
             {/* Overview Tab */}
             <TabsContent value="overview" className="space-y-6">
