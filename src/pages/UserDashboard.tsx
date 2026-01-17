@@ -377,10 +377,49 @@ export default function UserDashboard() {
 
               {trackedOrder && (
                 <div className="space-y-6">
+                  {/* Order Tracking Timeline */}
+                  <div className="bg-muted/30 rounded-lg p-6">
+                    <h4 className="font-semibold text-sm mb-6 text-foreground">Order Timeline</h4>
+                    <div className="relative">
+                      {/* Timeline visualization */}
+                      <div className="space-y-4">
+                        {[
+                          { status: 'pending', label: 'Order Placed', icon: '📦' },
+                          { status: 'confirmed', label: 'Confirmed', icon: '✓' },
+                          { status: 'processing', label: 'Processing', icon: '⚙' },
+                          { status: 'shipped', label: 'Shipped', icon: '🚚' },
+                          { status: 'delivered', label: 'Delivered', icon: '✓' },
+                        ].map((step, index, arr) => {
+                          const isActive = ['pending', 'confirmed', 'processing', 'shipped', 'delivered'].indexOf(trackedOrder.status?.toLowerCase() || 'pending') >= index;
+                          return (
+                            <div key={step.status} className="flex items-start gap-4">
+                              <div className={`flex items-center justify-center w-8 h-8 rounded-full font-bold text-sm shrink-0 ${
+                                isActive ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
+                              }`}>
+                                {step.icon}
+                              </div>
+                              <div className="flex-1 pt-1">
+                                <p className={`text-sm font-medium ${isActive ? 'text-foreground' : 'text-muted-foreground'}`}>
+                                  {step.label}
+                                </p>
+                              </div>
+                              {index < arr.length - 1 && (
+                                <div className={`absolute left-4 top-10 w-0.5 h-12 ${
+                                  isActive ? 'bg-primary' : 'bg-muted'
+                                }`} />
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Order Status Card */}
                   <div className="bg-muted/30 rounded-lg p-6">
                     <div className="flex items-center justify-between mb-4">
                       <div>
-                        <p className="text-xs font-semibold text-muted-foreground uppercase mb-1">Order Status</p>
+                        <p className="text-xs font-semibold text-muted-foreground uppercase mb-1">Current Status</p>
                         <p className="text-2xl font-bold text-foreground">
                           {trackedOrder.status?.charAt(0).toUpperCase() + (trackedOrder.status?.slice(1) || '')}
                         </p>

@@ -71,20 +71,33 @@ export default function Shop() {
     const fetchCategories = async () => {
       try {
         setIsCategoriesLoading(true);
-        const response = await fetch(`${API_URL}/categories`);
-        if (response.ok) {
-          const data = await response.json();
-          if (data.categories && Array.isArray(data.categories)) {
-            setCategories(data.categories);
-          } else {
-            setCategories([]);
-          }
+        const url = `${API_URL}/categories`;
+        console.log('Fetching categories from:', url);
+
+        const response = await fetch(url, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!response.ok) {
+          console.error(`API Error: ${response.status} ${response.statusText}`);
+          setCategories([]);
+          return;
+        }
+
+        const data = await response.json();
+        if (data.categories && Array.isArray(data.categories)) {
+          setCategories(data.categories);
         } else {
-          console.error('Failed to fetch categories');
           setCategories([]);
         }
       } catch (error) {
         console.error('Error fetching categories:', error);
+        if (error instanceof TypeError) {
+          console.error("Network error - API may be unreachable at:", API_URL);
+        }
         setCategories([]);
       } finally {
         setIsCategoriesLoading(false);
@@ -114,17 +127,30 @@ export default function Shop() {
     const fetchProducts = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch(`${API_URL}/products`);
-        if (response.ok) {
-          const data = await response.json();
-          const mappedProducts = (data.products || []).map((p: any) => normalizeProduct(p));
-          setProducts(mappedProducts);
-        } else {
-          console.error('Failed to fetch products');
+        const url = `${API_URL}/products`;
+        console.log('Fetching shop products from:', url);
+
+        const response = await fetch(url, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!response.ok) {
+          console.error(`API Error: ${response.status} ${response.statusText}`);
           setProducts([]);
+          return;
         }
+
+        const data = await response.json();
+        const mappedProducts = (data.products || []).map((p: any) => normalizeProduct(p));
+        setProducts(mappedProducts);
       } catch (error) {
-        console.error('Error fetching products:', error);
+        console.error('Error fetching shop products:', error);
+        if (error instanceof TypeError) {
+          console.error("Network error - API may be unreachable at:", API_URL);
+        }
         setProducts([]);
       } finally {
         setIsLoading(false);

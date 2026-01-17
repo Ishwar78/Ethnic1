@@ -13,16 +13,30 @@ export default function EthnicWear() {
     const fetchProducts = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch(`${API_URL}/products?category=ethnic_wear`);
-        if (response.ok) {
-          const data = await response.json();
-          const mapped = (data.products || []).map((p: any) => normalizeProduct(p));
-          setEthnicProducts(mapped);
-        } else {
+        const url = `${API_URL}/products?category=ethnic_wear`;
+        console.log('Fetching ethnic wear products from:', url);
+
+        const response = await fetch(url, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!response.ok) {
+          console.error(`API Error: ${response.status} ${response.statusText}`);
           setEthnicProducts([]);
+          return;
         }
+
+        const data = await response.json();
+        const mapped = (data.products || []).map((p: any) => normalizeProduct(p));
+        setEthnicProducts(mapped);
       } catch (error) {
-        console.error("Error fetching products:", error);
+        console.error("Error fetching ethnic wear products:", error);
+        if (error instanceof TypeError) {
+          console.error("Network error - API may be unreachable at:", API_URL);
+        }
         setEthnicProducts([]);
       } finally {
         setIsLoading(false);

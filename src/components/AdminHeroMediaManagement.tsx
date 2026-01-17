@@ -486,8 +486,11 @@ export default function AdminHeroMediaManagement() {
                               className="w-full h-full object-cover"
                               muted
                               onError={(e) => {
-                                console.error('Video load error:', e);
-                                const target = e.currentTarget;
+                                const target = e.currentTarget as HTMLVideoElement;
+                                console.error('Video load error:', {
+                                  url: target.src,
+                                  error: target.error?.message || 'Unknown error'
+                                });
                                 target.style.display = 'none';
                               }}
                             />

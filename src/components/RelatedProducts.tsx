@@ -43,14 +43,17 @@ export default function RelatedProducts({
 
         {/* Desktop Grid */}
         <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {products.map((product, index) => (
-            <ProductCard 
-              key={product.id} 
-              product={product} 
+          {products.map((product, index) => {
+            const productKey = product.id || product._id || `product-${index}-${product.name}`;
+            return (
+            <ProductCard
+              key={productKey}
+              product={product}
               index={index}
               showTrending={product.isBestseller}
             />
-          ))}
+            );
+          })}
         </div>
 
         {/* Mobile Carousel */}
@@ -60,18 +63,21 @@ export default function RelatedProducts({
             className="flex gap-4 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-4 -mx-4 px-4"
             style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
           >
-            {products.map((product, index) => (
+            {products.map((product, index) => {
+              const productKey = product.id || product._id || `product-mobile-${index}-${product.name}`;
+              return (
               <div
-                key={product.id}
+                key={productKey}
                 className="flex-shrink-0 w-[280px] snap-start"
               >
-                <ProductCard 
-                  product={product} 
+                <ProductCard
+                  product={product}
                   index={index}
                   showTrending={product.isBestseller}
                 />
               </div>
-            ))}
+              );
+            })}
           </div>
 
           {/* Mobile Navigation Buttons */}
