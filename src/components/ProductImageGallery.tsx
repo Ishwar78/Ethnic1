@@ -66,17 +66,7 @@ export default function ProductImageGallery({
         <img
           src={images[selectedImage]}
           alt={`${productName} - Image ${selectedImage + 1}`}
-          className={cn(
-            "w-full h-full object-cover transition-transform duration-300",
-          )}
-          style={
-            isZoomed
-              ? {
-                  transform: "scale(2)",
-                  transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%`,
-                }
-              : undefined
-          }
+          className="w-full h-full object-cover"
           draggable={false}
         />
 
@@ -86,14 +76,6 @@ export default function ProductImageGallery({
             -{discount}% OFF
           </span>
         )}
-
-        {/* Zoom Indicator */}
-        <div className={cn(
-          "absolute bottom-4 right-4 bg-background/80 backdrop-blur-sm rounded-full p-2 transition-opacity",
-          isZoomed ? "opacity-0" : "opacity-100 group-hover:opacity-100"
-        )}>
-          <ZoomIn className="h-5 w-5 text-foreground" />
-        </div>
 
         {/* Mobile Navigation Arrows */}
         <div className="absolute inset-y-0 left-0 right-0 flex items-center justify-between px-2 md:hidden pointer-events-none">
