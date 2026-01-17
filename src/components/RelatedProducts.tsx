@@ -43,14 +43,17 @@ export default function RelatedProducts({
 
         {/* Desktop Grid */}
         <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {products.map((product, index) => (
-            <ProductCard 
-              key={product.id} 
-              product={product} 
+          {products.map((product, index) => {
+            const productKey = product.id || product._id || `product-${index}-${product.name}`;
+            return (
+            <ProductCard
+              key={productKey}
+              product={product}
               index={index}
               showTrending={product.isBestseller}
             />
-          ))}
+            );
+          })}
         </div>
 
         {/* Mobile Carousel */}
