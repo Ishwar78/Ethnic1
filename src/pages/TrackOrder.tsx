@@ -12,12 +12,21 @@ import { useToast } from "@/hooks/use-toast";
 
 const API_URL = import.meta.env.VITE_API_URL || '/api';
 
+interface TrackingUpdate {
+  status: string;
+  message: string;
+  location: string;
+  timestamp: string;
+}
+
 interface OrderDetails {
   _id: string;
   trackingId: string;
   status: string;
   totalAmount: number;
   createdAt: string;
+  estimatedDelivery?: string;
+  trackingUpdates?: TrackingUpdate[];
   items: Array<{
     name: string;
     quantity: number;
@@ -206,10 +215,45 @@ export default function TrackOrder() {
               </div>
 
               {/* Tracking Timeline */}
-              {['confirmed', 'shipped', 'delivered'].includes(order.status) && (
-                <div className="bg-card border border-border rounded-xl p-6">
-                  <h3 className="font-semibold text-foreground mb-6">Order Progress</h3>
+              <div className="bg-card border border-border rounded-xl p-6">
+                <h3 className="font-semibold text-foreground mb-6">Tracking Updates</h3>
 
+                {order.trackingUpdates && order.trackingUpdates.length > 0 ? (
+                  <div className="space-y-4">
+                    {order.trackingUpdates.map((update, index) => (
+                      <div key={index} className="flex gap-4 pb-4 last:pb-0">
+                        {/* Timeline circle and line */}
+                        <div className="flex flex-col items-center">
+                          <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm bg-green-500 text-white">
+                            ✓
+                          </div>
+                          {index < (order.trackingUpdates?.length || 0) - 1 && (
+                            <div className="w-1 h-16 mt-2 bg-green-500" />
+                          )}
+                        </div>
+
+                        {/* Update content */}
+                        <div className="pt-1 pb-2 flex-1">
+                          <div className="flex justify-between items-start mb-1">
+                            <p className="font-semibold text-foreground capitalize">
+                              {update.status.replace(/_/g, ' ')}
+                            </p>
+                            <span className="text-xs text-muted-foreground">
+                              {new Date(update.timestamp).toLocaleDateString()} {new Date(update.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </span>
+                          </div>
+                          <p className="text-sm text-foreground">{update.message}</p>
+                          {update.location && (
+                            <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
+                              <MapPin className="h-3 w-3" />
+                              {update.location}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
                   <div className="space-y-4">
                     {statusSteps.map((step, index) => (
                       <div key={step.key} className="flex gap-4">
@@ -244,6 +288,26 @@ export default function TrackOrder() {
                         </div>
                       </div>
                     ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Estimated Delivery */}
+              {order.estimatedDelivery && (
+                <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-blue-600 font-semibold mb-1">Estimated Delivery</p>
+                      <p className="font-bold text-lg text-blue-600">
+                        {new Date(order.estimatedDelivery).toLocaleDateString('en-IN', {
+                          weekday: 'short',
+                          year: 'numeric',
+                          month: 'short',
+                          day: 'numeric'
+                        })}
+                      </p>
+                    </div>
+                    <Calendar className="h-8 w-8 text-blue-600 opacity-50" />
                   </div>
                 </div>
               )}

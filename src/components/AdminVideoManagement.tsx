@@ -105,7 +105,7 @@ const AdminVideoManagement = () => {
         category: formData.category,
         price: parseFloat(formData.price),
         originalPrice: parseFloat(formData.originalPrice),
-        badge: formData.badge || null,
+        badge: formData.badge && formData.badge !== 'none' ? formData.badge : null,
         isActive: formData.isActive,
         productId: formData.productId,
       };
@@ -332,7 +332,7 @@ const AdminVideoManagement = () => {
                       <SelectValue placeholder="Select badge" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">None</SelectItem>
+                      <SelectItem value="none">None</SelectItem>
                       <SelectItem value="NEW">New</SelectItem>
                       <SelectItem value="BESTSELLER">Bestseller</SelectItem>
                     </SelectContent>

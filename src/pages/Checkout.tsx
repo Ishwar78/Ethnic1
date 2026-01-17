@@ -682,7 +682,7 @@ export default function Checkout() {
                         <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4 space-y-3">
                           <div className="space-y-2">
                             <Label htmlFor="upi-transaction-id" className="text-foreground font-medium">
-                              Transaction ID <span className="text-muted-foreground text-xs font-normal">(Optional)</span>
+                              Transaction ID <span className="text-red-500 font-bold">*</span>
                             </Label>
                             <Input
                               id="upi-transaction-id"
@@ -690,9 +690,10 @@ export default function Checkout() {
                               value={upiTransactionId}
                               onChange={(e) => setUpiTransactionId(e.target.value)}
                               className="font-mono text-sm bg-white"
+                              required
                             />
                             <p className="text-xs text-muted-foreground">
-                              After completing payment, find your transaction ID in your UPI app under "Recent Transactions" or "Payment Confirmation"
+                              After completing payment, find your transaction ID in your UPI app under "Recent Transactions" or "Payment Confirmation". This field is mandatory.
                             </p>
                           </div>
                         </div>

@@ -58,6 +58,23 @@ const orderSchema = new mongoose.Schema({
     type: String,
     default: null
   },
+  trackingUpdates: [{
+    status: {
+      type: String,
+      enum: ['confirmed', 'processing', 'shipped', 'in_transit', 'out_for_delivery', 'delivered'],
+      default: 'confirmed'
+    },
+    message: String,
+    location: String,
+    timestamp: {
+      type: Date,
+      default: Date.now
+    }
+  }],
+  estimatedDelivery: {
+    type: Date,
+    default: null
+  },
   createdAt: {
     type: Date,
     default: Date.now

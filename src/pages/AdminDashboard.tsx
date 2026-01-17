@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Users, User, Package, ShoppingCart, BarChart3, Search, Trash2, MapPin, Phone, Mail, Loader2 } from "lucide-react";
+import { Users, User, Package, ShoppingCart, BarChart3, Search, Trash2, MapPin, Phone, Mail, Loader2, Menu, X } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import {
   Select,
@@ -117,6 +117,7 @@ export default function AdminDashboard() {
   const [trackingId, setTrackingId] = useState<string>("");
   const [updatingTrackingId, setUpdatingTrackingId] = useState(false);
   const [showInvoice, setShowInvoice] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const API_URL = import.meta.env.VITE_API_URL || '/api';
 
@@ -396,7 +397,7 @@ export default function AdminDashboard() {
       </Helmet>
 
       <div className="flex min-h-screen w-full bg-background">
-        <AdminSidebar />
+        <AdminSidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 
         <main className="flex-1 p-6 overflow-auto">
           <div className="mb-8">
