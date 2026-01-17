@@ -61,9 +61,11 @@ export default function RecentlyViewed({ items }: RecentlyViewedProps) {
           className="flex gap-4 overflow-x-auto scrollbar-hide pb-4 -mx-4 px-4 snap-x snap-mandatory"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
-          {items.map((item, index) => (
+          {items.map((item, index) => {
+            const itemKey = item.id || `recently-viewed-${index}-${item.name}`;
+            return (
             <Link
-              key={item.id}
+              key={itemKey}
               to={`/product/${item.id}`}
               className={cn(
                 "flex-shrink-0 w-[180px] group animate-fade-in snap-start",
@@ -104,7 +106,8 @@ export default function RecentlyViewed({ items }: RecentlyViewedProps) {
                 </div>
               </div>
             </Link>
-          ))}
+            );
+          })}
         </div>
 
         {/* Mobile Navigation */}
