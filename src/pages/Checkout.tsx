@@ -240,11 +240,27 @@ export default function Checkout() {
             }),
           });
 
-          if (!response.ok) {
+          if (response.ok) {
+            const updatedUserData = await response.json();
+            // Update saved addresses with the new address
+            if (updatedUserData.user?.addresses) {
+              setSavedAddresses(updatedUserData.user.addresses.map((addr: any) => ({
+                street: addr.street || '',
+                city: addr.city || '',
+                state: addr.state || '',
+                zipCode: addr.zipCode || '',
+                country: addr.country || '',
+                phone: addr.phone || '',
+              })));
+            }
+            toast.success("Address saved successfully!");
+          } else {
             console.error('Failed to save address to profile');
+            toast.error("Failed to save address");
           }
         } catch (error) {
           console.error('Error saving address:', error);
+          toast.error("Error saving address");
         }
       }
 
