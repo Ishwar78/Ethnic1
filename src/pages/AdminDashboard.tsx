@@ -117,6 +117,7 @@ export default function AdminDashboard() {
   const [trackingId, setTrackingId] = useState<string>("");
   const [updatingTrackingId, setUpdatingTrackingId] = useState(false);
   const [showInvoice, setShowInvoice] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const API_URL = import.meta.env.VITE_API_URL || '/api';
 
