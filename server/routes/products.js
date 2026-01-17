@@ -19,22 +19,22 @@ function generateSlug(name) {
 router.get('/', async (req, res) => {
   try {
     const { category, search, sortBy } = req.query;
-    
+
     let query = { isActive: true };
-    
+
     if (category && category !== 'all') {
       query.category = category;
     }
-    
+
     if (search) {
       query.$or = [
         { name: { $regex: search, $options: 'i' } },
         { description: { $regex: search, $options: 'i' } }
       ];
     }
-    
+
     let products = Product.find(query);
-    
+
     if (sortBy === 'price-low') {
       products = products.sort({ price: 1 });
     } else if (sortBy === 'price-high') {
@@ -44,17 +44,20 @@ router.get('/', async (req, res) => {
     } else if (sortBy === 'rating') {
       products = products.sort({ rating: -1 });
     }
-    
-    const result = await products.lean();
-    
+
+    const result = await products.lean().exec();
+
     res.json({
       success: true,
-      products: result,
-      total: result.length,
+      products: result || [],
+      total: result?.length || 0,
     });
   } catch (error) {
-    console.error('Error fetching products:', error);
-    res.status(500).json({ error: 'Failed to fetch products' });
+    console.error('Error fetching products:', error.message || error);
+    res.status(500).json({
+      error: 'Failed to fetch products',
+      message: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
   }
 });
 
