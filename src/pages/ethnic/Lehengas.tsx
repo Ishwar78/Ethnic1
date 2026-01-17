@@ -13,7 +13,22 @@ export default function Lehengas() {
     const fetchProducts = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch(`${API_URL}/products?category=ethnic_wear`);
+        const url = `${API_URL}/products?category=ethnic_wear`;
+        console.log('Fetching lehengas from:', url);
+
+        const response = await fetch(url, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!response.ok) {
+          console.error(`API Error: ${response.status} ${response.statusText}`);
+          setProducts([]);
+          return;
+        }
+
         const data = await response.json();
         if (data.success || data.products) {
           const filtered = (data.products || []).filter((p: any) => p.subcategory === "Lehengas");
@@ -21,7 +36,11 @@ export default function Lehengas() {
           setProducts(mapped);
         }
       } catch (error) {
-        console.error('Error fetching products:', error);
+        console.error('Error fetching lehengas products:', error);
+        if (error instanceof TypeError) {
+          console.error("Network error - API may be unreachable at:", API_URL);
+        }
+        setProducts([]);
       } finally {
         setIsLoading(false);
       }
