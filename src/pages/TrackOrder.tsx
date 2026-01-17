@@ -12,12 +12,21 @@ import { useToast } from "@/hooks/use-toast";
 
 const API_URL = import.meta.env.VITE_API_URL || '/api';
 
+interface TrackingUpdate {
+  status: string;
+  message: string;
+  location: string;
+  timestamp: string;
+}
+
 interface OrderDetails {
   _id: string;
   trackingId: string;
   status: string;
   totalAmount: number;
   createdAt: string;
+  estimatedDelivery?: string;
+  trackingUpdates?: TrackingUpdate[];
   items: Array<{
     name: string;
     quantity: number;
