@@ -532,15 +532,21 @@ const AdminVideoManagement = () => {
                   className="flex items-center justify-between p-4 border rounded-lg"
                 >
                   <div className="flex items-center gap-4 flex-1">
-                    <div className="w-24 h-16 rounded-lg overflow-hidden border border-border bg-black/10">
-                      <video
-                        src={video.url}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          const target = e.target as HTMLVideoElement;
-                          target.style.display = 'none';
-                        }}
-                      />
+                    <div className="w-24 h-16 rounded-lg overflow-hidden border border-border bg-black/10 flex items-center justify-center">
+                      {parseVideoSource(video.url).type === 'html5' ? (
+                        <video
+                          src={video.url}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            const target = e.target as HTMLVideoElement;
+                            target.style.display = 'none';
+                          }}
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/10 to-primary/20">
+                          <Play className="h-6 w-6 text-primary" />
+                        </div>
+                      )}
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
