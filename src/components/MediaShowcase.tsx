@@ -159,7 +159,14 @@ const VideoPlayer = ({ url, isLoaded, onLoad, isHovered }: VideoPlayerProps) => 
         onLoadedData={onLoad}
         onCanPlay={onLoad}
         onPlay={() => console.log('Video playing:', url)}
-        onError={(e) => console.error('Video error:', e)}
+        onError={(e) => {
+          const target = e.target as HTMLVideoElement;
+          console.error('Video load error:', {
+            url: videoSource.directUrl,
+            error: target.error?.message || 'Unknown video error',
+            code: target.error?.code
+          });
+        }}
       />
     );
   }
