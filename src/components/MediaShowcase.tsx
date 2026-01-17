@@ -259,7 +259,8 @@ const VideoPlayer = ({ url, isLoaded, onLoad, isHovered }: VideoPlayerProps) => 
     );
   }
 
-  // Fallback
+  // Fallback - call onLoad immediately
+  setTimeout(onLoad, 100);
   return <div className="w-full h-full bg-gray-300" />;
 };
 
