@@ -71,20 +71,33 @@ export default function Shop() {
     const fetchCategories = async () => {
       try {
         setIsCategoriesLoading(true);
-        const response = await fetch(`${API_URL}/categories`);
-        if (response.ok) {
-          const data = await response.json();
-          if (data.categories && Array.isArray(data.categories)) {
-            setCategories(data.categories);
-          } else {
-            setCategories([]);
-          }
+        const url = `${API_URL}/categories`;
+        console.log('Fetching categories from:', url);
+
+        const response = await fetch(url, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!response.ok) {
+          console.error(`API Error: ${response.status} ${response.statusText}`);
+          setCategories([]);
+          return;
+        }
+
+        const data = await response.json();
+        if (data.categories && Array.isArray(data.categories)) {
+          setCategories(data.categories);
         } else {
-          console.error('Failed to fetch categories');
           setCategories([]);
         }
       } catch (error) {
         console.error('Error fetching categories:', error);
+        if (error instanceof TypeError) {
+          console.error("Network error - API may be unreachable at:", API_URL);
+        }
         setCategories([]);
       } finally {
         setIsCategoriesLoading(false);
