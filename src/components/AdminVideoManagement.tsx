@@ -287,17 +287,8 @@ const AdminVideoManagement = () => {
                 <p className="text-xs text-muted-foreground mt-2">
                   ✅ Supports: YouTube links • Instagram Reels/Posts • TikTok videos • Vimeo • Direct MP4/WebM links (Pixabay, Pexels, etc.)
                 </p>
-                {formData.url && formData.url.includes('mp4') && (
-                  <div className="relative w-full h-32 rounded-lg overflow-hidden border border-border bg-black mt-2">
-                    <video
-                      src={formData.url}
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        const target = e.target as HTMLVideoElement;
-                        target.style.display = 'none';
-                      }}
-                    />
-                  </div>
+                {formData.url && (
+                  <VideoPreview url={formData.url} />
                 )}
               </div>
 
