@@ -118,6 +118,26 @@ export default function AdminDashboard() {
   const [updatingTrackingId, setUpdatingTrackingId] = useState(false);
   const [showInvoice, setShowInvoice] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Tab definitions
+  const tabs = [
+    { value: 'overview', label: 'Overview' },
+    { value: 'hero-media', label: 'Hero Slider' },
+    { value: 'videos', label: 'Trending Videos' },
+    { value: 'products', label: 'Products' },
+    { value: 'categories', label: 'Categories' },
+    { value: 'coupons', label: 'Coupons' },
+    { value: 'banners', label: 'Banners' },
+    { value: 'payments', label: 'Payments' },
+    { value: 'invoices', label: 'Invoices' },
+    { value: 'size-charts', label: 'Size Charts' },
+    { value: 'users', label: 'Users' },
+    { value: 'orders', label: 'Orders' },
+    { value: 'tickets', label: 'Tickets' },
+    { value: 'contact', label: 'Contact' },
+    { value: 'settings', label: 'Settings' },
+  ];
 
   const API_URL = import.meta.env.VITE_API_URL || '/api';
 
