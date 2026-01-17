@@ -215,8 +215,10 @@ const VideoPlayer = ({ url, isLoaded, onLoad, isHovered }: VideoPlayerProps) => 
 
   // For Instagram (static display - no autoplay)
   if (videoType === 'instagram') {
+    // Call onLoad immediately for Instagram
+    setTimeout(onLoad, 100);
     return (
-      <div className={`w-full h-full bg-gray-200 flex items-center justify-center rounded-lg ${
+      <div className={`w-full h-full bg-gray-200 flex items-center justify-center rounded-lg transition-opacity duration-300 ${
         isLoaded ? "opacity-100" : "opacity-0"
       }`}>
         <div className="text-center">
@@ -236,8 +238,10 @@ const VideoPlayer = ({ url, isLoaded, onLoad, isHovered }: VideoPlayerProps) => 
 
   // For TikTok (static display - no autoplay)
   if (videoType === 'tiktok') {
+    // Call onLoad immediately for TikTok
+    setTimeout(onLoad, 100);
     return (
-      <div className={`w-full h-full bg-gray-200 flex items-center justify-center rounded-lg ${
+      <div className={`w-full h-full bg-gray-200 flex items-center justify-center rounded-lg transition-opacity duration-300 ${
         isLoaded ? "opacity-100" : "opacity-0"
       }`}>
         <div className="text-center">
