@@ -27,6 +27,28 @@ interface SavedAddress {
   phone?: string;
 }
 
+// Function to check if two addresses are identical
+const areAddressesEqual = (addr1: SavedAddress, addr2: SavedAddress): boolean => {
+  return (
+    addr1.street?.toLowerCase().trim() === addr2.street?.toLowerCase().trim() &&
+    addr1.city?.toLowerCase().trim() === addr2.city?.toLowerCase().trim() &&
+    addr1.state?.toLowerCase().trim() === addr2.state?.toLowerCase().trim() &&
+    addr1.zipCode?.trim() === addr2.zipCode?.trim()
+  );
+};
+
+// Function to deduplicate addresses
+const deduplicateAddresses = (addresses: SavedAddress[]): SavedAddress[] => {
+  const seen: SavedAddress[] = [];
+  for (const addr of addresses) {
+    const isDuplicate = seen.some(seenAddr => areAddressesEqual(seenAddr, addr));
+    if (!isDuplicate) {
+      seen.push(addr);
+    }
+  }
+  return seen;
+};
+
 export default function Checkout() {
   const navigate = useNavigate();
   const { items, subtotal, totalSavings, clearCart } = useCart();
