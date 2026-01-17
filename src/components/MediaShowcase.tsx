@@ -173,6 +173,8 @@ const VideoPlayer = ({ url, isLoaded, onLoad, isHovered }: VideoPlayerProps) => 
 
   // For YouTube videos
   if (videoType === 'youtube') {
+    // YouTube iframes load quickly, call onLoad immediately
+    setTimeout(onLoad, 100);
     return (
       <iframe
         src={videoSource.embedUrl}
@@ -182,7 +184,6 @@ const VideoPlayer = ({ url, isLoaded, onLoad, isHovered }: VideoPlayerProps) => 
         className={`w-full h-full transition-transform duration-500 group-hover:scale-105 ${
           isLoaded ? "opacity-100" : "opacity-0"
         }`}
-        onLoad={onLoad}
         style={{
           border: 'none',
           borderRadius: '12px',
@@ -193,6 +194,8 @@ const VideoPlayer = ({ url, isLoaded, onLoad, isHovered }: VideoPlayerProps) => 
 
   // For Vimeo videos
   if (videoType === 'vimeo') {
+    // Vimeo iframes load quickly, call onLoad immediately
+    setTimeout(onLoad, 100);
     return (
       <iframe
         src={videoSource.embedUrl}
@@ -202,7 +205,6 @@ const VideoPlayer = ({ url, isLoaded, onLoad, isHovered }: VideoPlayerProps) => 
         className={`w-full h-full transition-transform duration-500 group-hover:scale-105 ${
           isLoaded ? "opacity-100" : "opacity-0"
         }`}
-        onLoad={onLoad}
         style={{
           border: 'none',
           borderRadius: '12px',
