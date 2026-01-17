@@ -244,43 +244,58 @@ export default function Checkout() {
       // Save new address to user profile if adding new address
       if (isAddingNewAddress && token && user) {
         try {
-          const response = await fetch(`${API_URL}/auth/profile`, {
-            method: 'PUT',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`,
-            },
-            body: JSON.stringify({
-              addAddress: {
-                label: `${shippingAddress.firstName || 'Home'}`,
-                street: shippingAddress.address,
-                city: shippingAddress.city,
-                state: shippingAddress.state,
-                zipCode: shippingAddress.pincode,
-                country: "India",
-                phone: shippingAddress.phone,
-              },
-              phone: shippingAddress.phone,
-            }),
-          });
+          const newAddr: SavedAddress = {
+            street: shippingAddress.address,
+            city: shippingAddress.city,
+            state: shippingAddress.state,
+            zipCode: shippingAddress.pincode,
+            country: "India",
+            phone: shippingAddress.phone,
+          };
 
-          if (response.ok) {
-            const updatedUserData = await response.json();
-            // Update saved addresses with the new address
-            if (updatedUserData.user?.addresses) {
-              setSavedAddresses(updatedUserData.user.addresses.map((addr: any) => ({
-                street: addr.street || '',
-                city: addr.city || '',
-                state: addr.state || '',
-                zipCode: addr.zipCode || '',
-                country: addr.country || '',
-                phone: addr.phone || '',
-              })));
+          // Check if this address already exists to prevent duplicates
+          const isDuplicate = savedAddresses.some(addr => areAddressesEqual(addr, newAddr));
+
+          if (!isDuplicate) {
+            const response = await fetch(`${API_URL}/auth/profile`, {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+              },
+              body: JSON.stringify({
+                addAddress: {
+                  label: `${shippingAddress.firstName || 'Home'}`,
+                  street: shippingAddress.address,
+                  city: shippingAddress.city,
+                  state: shippingAddress.state,
+                  zipCode: shippingAddress.pincode,
+                  country: "India",
+                  phone: shippingAddress.phone,
+                },
+                phone: shippingAddress.phone,
+              }),
+            });
+
+            if (response.ok) {
+              const updatedUserData = await response.json();
+              // Update saved addresses with the new address and deduplicate
+              if (updatedUserData.user?.addresses) {
+                const mappedAddresses = updatedUserData.user.addresses.map((addr: any) => ({
+                  street: addr.street || '',
+                  city: addr.city || '',
+                  state: addr.state || '',
+                  zipCode: addr.zipCode || '',
+                  country: addr.country || '',
+                  phone: addr.phone || '',
+                }));
+                setSavedAddresses(deduplicateAddresses(mappedAddresses));
+              }
+              toast.success("Address saved successfully!");
+            } else {
+              console.error('Failed to save address to profile');
+              toast.error("Failed to save address");
             }
-            toast.success("Address saved successfully!");
-          } else {
-            console.error('Failed to save address to profile');
-            toast.error("Failed to save address");
           }
         } catch (error) {
           console.error('Error saving address:', error);
