@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Users, User, Package, ShoppingCart, BarChart3, Search, Trash2, MapPin, Phone, Mail, Loader2 } from "lucide-react";
+import { Users, User, Package, ShoppingCart, BarChart3, Search, Trash2, MapPin, Phone, Mail, Loader2, Menu, X } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import {
   Select,
