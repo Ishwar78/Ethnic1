@@ -15,21 +15,8 @@ export default function ProductImageGallery({
   discount = 0 
 }: ProductImageGalleryProps) {
   const [selectedImage, setSelectedImage] = useState(0);
-  const [isZoomed, setIsZoomed] = useState(false);
-  const [zoomPosition, setZoomPosition] = useState({ x: 50, y: 50 });
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const imageContainerRef = useRef<HTMLDivElement>(null);
-
-  // Handle mouse move for zoom
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!imageContainerRef.current || !isZoomed) return;
-
-    const rect = imageContainerRef.current.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width) * 100;
-    const y = ((e.clientY - rect.top) / rect.height) * 100;
-    
-    setZoomPosition({ x, y });
-  };
 
   // Handle swipe gestures
   const handleTouchStart = (e: React.TouchEvent) => {
