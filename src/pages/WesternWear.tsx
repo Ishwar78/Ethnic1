@@ -13,16 +13,30 @@ export default function WesternWear() {
     const fetchProducts = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch(`${API_URL}/products?category=western_wear`);
-        if (response.ok) {
-          const data = await response.json();
-          const mapped = (data.products || []).map((p: any) => normalizeProduct(p));
-          setWesternProducts(mapped);
-        } else {
+        const url = `${API_URL}/products?category=western_wear`;
+        console.log('Fetching western wear products from:', url);
+
+        const response = await fetch(url, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!response.ok) {
+          console.error(`API Error: ${response.status} ${response.statusText}`);
           setWesternProducts([]);
+          return;
         }
+
+        const data = await response.json();
+        const mapped = (data.products || []).map((p: any) => normalizeProduct(p));
+        setWesternProducts(mapped);
       } catch (error) {
-        console.error("Error fetching products:", error);
+        console.error("Error fetching western wear products:", error);
+        if (error instanceof TypeError) {
+          console.error("Network error - API may be unreachable at:", API_URL);
+        }
         setWesternProducts([]);
       } finally {
         setIsLoading(false);
