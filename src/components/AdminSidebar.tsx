@@ -136,12 +136,25 @@ export default function AdminSidebar({ isOpen = true, onClose }: AdminSidebarPro
   };
 
   return (
-    <aside
-      className={cn(
-        "h-screen bg-card border-r border-border flex flex-col transition-all duration-300 sticky top-0",
-        collapsed ? "w-16" : "w-64"
+    <>
+      {/* Mobile overlay */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 md:hidden z-40"
+          onClick={onClose}
+        />
       )}
-    >
+
+      {/* Sidebar */}
+      <aside
+        className={cn(
+          "h-screen bg-card border-r border-border flex flex-col transition-all duration-300 sticky top-0",
+          "fixed md:sticky left-0 top-0 z-50 md:z-auto",
+          "md:translate-x-0 max-w-xs",
+          isOpen ? "translate-x-0" : "-translate-x-full",
+          collapsed ? "w-16" : "w-64"
+        )}
+      >
       {/* Header */}
       <div className="p-4 flex items-center justify-between border-b border-border">
         {!collapsed && (
@@ -284,6 +297,7 @@ export default function AdminSidebar({ isOpen = true, onClose }: AdminSidebarPro
           </p>
         </div>
       )}
-    </aside>
+      </aside>
+    </>
   );
 }
