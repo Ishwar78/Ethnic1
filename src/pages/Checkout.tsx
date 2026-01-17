@@ -121,8 +121,10 @@ export default function Checkout() {
         });
       }
 
-      setSavedAddresses(addresses);
-      if (addresses.length > 0) {
+      // Deduplicate addresses before setting them
+      const uniqueAddresses = deduplicateAddresses(addresses);
+      setSavedAddresses(uniqueAddresses);
+      if (uniqueAddresses.length > 0) {
         setSelectedAddressIndex(0);
         setIsAddingNewAddress(false);
       } else {
