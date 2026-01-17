@@ -20,9 +20,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Plus, Edit, Trash2, Video, Loader2 } from "lucide-react";
+import { Plus, Edit, Trash2, Video, Loader2, Play, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
+import { parseVideoSource } from "@/lib/videoUtils";
 
 interface VideoItem {
   _id?: string;
