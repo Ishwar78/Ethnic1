@@ -20,9 +20,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Plus, Edit, Trash2, Video, Loader2 } from "lucide-react";
+import { Plus, Edit, Trash2, Video, Loader2, Play, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
+import { parseVideoSource } from "@/lib/videoUtils";
 
 interface VideoItem {
   _id?: string;
@@ -40,6 +41,86 @@ interface VideoItem {
 }
 
 const API_URL = import.meta.env.VITE_API_URL || '/api';
+
+/**
+ * Video Preview Component - Shows preview for all video types
+ */
+interface VideoPreviewProps {
+  url: string;
+}
+
+const VideoPreview = ({ url }: VideoPreviewProps) => {
+  if (!url) return null;
+
+  const videoSource = parseVideoSource(url);
+  const isYouTube = videoSource.type === 'youtube';
+  const isVimeo = videoSource.type === 'vimeo';
+  const isInstagram = videoSource.type === 'instagram';
+  const isTikTok = videoSource.type === 'tiktok';
+  const isHtml5 = videoSource.type === 'html5';
+
+  return (
+    <div className="mt-3 space-y-2">
+      {isYouTube && videoSource.embedUrl && (
+        <div className="relative w-full h-40 rounded-lg overflow-hidden border border-border bg-black">
+          <iframe
+            src={videoSource.embedUrl}
+            className="w-full h-full"
+            allow="autoplay; fullscreen; picture-in-picture"
+            allowFullScreen
+            frameBorder="0"
+          />
+        </div>
+      )}
+      {isVimeo && videoSource.embedUrl && (
+        <div className="relative w-full h-40 rounded-lg overflow-hidden border border-border bg-black">
+          <iframe
+            src={videoSource.embedUrl}
+            className="w-full h-full"
+            allow="autoplay; fullscreen; picture-in-picture"
+            allowFullScreen
+            frameBorder="0"
+          />
+        </div>
+      )}
+      {isInstagram && videoSource.embedUrl && (
+        <div className="relative w-full rounded-lg overflow-hidden border border-border bg-black/5 p-4 flex items-center justify-center min-h-40">
+          <div className="text-center">
+            <ExternalLink className="h-8 w-8 text-primary mx-auto mb-2" />
+            <p className="text-sm font-medium">Instagram Preview</p>
+            <a href={url} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline mt-1">
+              Open in Instagram
+            </a>
+          </div>
+        </div>
+      )}
+      {isTikTok && videoSource.embedUrl && (
+        <div className="relative w-full rounded-lg overflow-hidden border border-border bg-black/5 p-4 flex items-center justify-center min-h-40">
+          <div className="text-center">
+            <Play className="h-8 w-8 text-primary mx-auto mb-2" />
+            <p className="text-sm font-medium">TikTok Video</p>
+            <a href={url} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline mt-1">
+              Open on TikTok
+            </a>
+          </div>
+        </div>
+      )}
+      {isHtml5 && videoSource.directUrl && (
+        <div className="relative w-full h-40 rounded-lg overflow-hidden border border-border bg-black">
+          <video
+            src={videoSource.directUrl}
+            className="w-full h-full object-cover"
+            controls
+            onError={(e) => {
+              const target = e.target as HTMLVideoElement;
+              target.style.display = 'none';
+            }}
+          />
+        </div>
+      )}
+    </div>
+  );
+};
 
 const AdminVideoManagement = () => {
   const { token } = useAuth();
@@ -286,17 +367,8 @@ const AdminVideoManagement = () => {
                 <p className="text-xs text-muted-foreground mt-2">
                   ✅ Supports: YouTube links • Instagram Reels/Posts • TikTok videos • Vimeo • Direct MP4/WebM links (Pixabay, Pexels, etc.)
                 </p>
-                {formData.url && formData.url.includes('mp4') && (
-                  <div className="relative w-full h-32 rounded-lg overflow-hidden border border-border bg-black mt-2">
-                    <video
-                      src={formData.url}
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        const target = e.target as HTMLVideoElement;
-                        target.style.display = 'none';
-                      }}
-                    />
-                  </div>
+                {formData.url && (
+                  <VideoPreview url={formData.url} />
                 )}
               </div>
 
@@ -460,15 +532,21 @@ const AdminVideoManagement = () => {
                   className="flex items-center justify-between p-4 border rounded-lg"
                 >
                   <div className="flex items-center gap-4 flex-1">
-                    <div className="w-24 h-16 rounded-lg overflow-hidden border border-border bg-black/10">
-                      <video
-                        src={video.url}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          const target = e.target as HTMLVideoElement;
-                          target.style.display = 'none';
-                        }}
-                      />
+                    <div className="w-24 h-16 rounded-lg overflow-hidden border border-border bg-black/10 flex items-center justify-center">
+                      {parseVideoSource(video.url).type === 'html5' ? (
+                        <video
+                          src={video.url}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            const target = e.target as HTMLVideoElement;
+                            target.style.display = 'none';
+                          }}
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/10 to-primary/20">
+                          <Play className="h-6 w-6 text-primary" />
+                        </div>
+                      )}
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center gap-2">

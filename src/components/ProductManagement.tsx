@@ -115,6 +115,17 @@ export default function ProductManagement() {
 
   const handleEdit = (product: Product) => {
     setSelectedProduct(product);
+
+    // Load existing images from the product (excluding the main image)
+    let existingImages: string[] = [];
+    if (product && typeof product === 'object' && 'images' in product) {
+      const productImages = (product as any).images;
+      if (Array.isArray(productImages)) {
+        // Filter out the main image if it's duplicated in the images array
+        existingImages = productImages.filter((img: string) => img !== product.image);
+      }
+    }
+
     setFormData({
       name: product.name,
       price: product.price.toString(),
@@ -129,10 +140,10 @@ export default function ProductManagement() {
       isWinter: product.isWinter || false,
       description: "",
       image: product.image,
-      images: [],
+      images: existingImages,
     });
     setImagePreview(product.image);
-    setImagePreviews([]);
+    setImagePreviews(existingImages);
     setIsAddMode(false);
     setIsDialogOpen(true);
   };

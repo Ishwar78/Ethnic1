@@ -173,6 +173,8 @@ const VideoPlayer = ({ url, isLoaded, onLoad, isHovered }: VideoPlayerProps) => 
 
   // For YouTube videos
   if (videoType === 'youtube') {
+    // YouTube iframes load quickly, call onLoad immediately
+    setTimeout(onLoad, 100);
     return (
       <iframe
         src={videoSource.embedUrl}
@@ -182,7 +184,6 @@ const VideoPlayer = ({ url, isLoaded, onLoad, isHovered }: VideoPlayerProps) => 
         className={`w-full h-full transition-transform duration-500 group-hover:scale-105 ${
           isLoaded ? "opacity-100" : "opacity-0"
         }`}
-        onLoad={onLoad}
         style={{
           border: 'none',
           borderRadius: '12px',
@@ -193,6 +194,8 @@ const VideoPlayer = ({ url, isLoaded, onLoad, isHovered }: VideoPlayerProps) => 
 
   // For Vimeo videos
   if (videoType === 'vimeo') {
+    // Vimeo iframes load quickly, call onLoad immediately
+    setTimeout(onLoad, 100);
     return (
       <iframe
         src={videoSource.embedUrl}
@@ -202,7 +205,6 @@ const VideoPlayer = ({ url, isLoaded, onLoad, isHovered }: VideoPlayerProps) => 
         className={`w-full h-full transition-transform duration-500 group-hover:scale-105 ${
           isLoaded ? "opacity-100" : "opacity-0"
         }`}
-        onLoad={onLoad}
         style={{
           border: 'none',
           borderRadius: '12px',
@@ -213,8 +215,10 @@ const VideoPlayer = ({ url, isLoaded, onLoad, isHovered }: VideoPlayerProps) => 
 
   // For Instagram (static display - no autoplay)
   if (videoType === 'instagram') {
+    // Call onLoad immediately for Instagram
+    setTimeout(onLoad, 100);
     return (
-      <div className={`w-full h-full bg-gray-200 flex items-center justify-center rounded-lg ${
+      <div className={`w-full h-full bg-gray-200 flex items-center justify-center rounded-lg transition-opacity duration-300 ${
         isLoaded ? "opacity-100" : "opacity-0"
       }`}>
         <div className="text-center">
@@ -234,8 +238,10 @@ const VideoPlayer = ({ url, isLoaded, onLoad, isHovered }: VideoPlayerProps) => 
 
   // For TikTok (static display - no autoplay)
   if (videoType === 'tiktok') {
+    // Call onLoad immediately for TikTok
+    setTimeout(onLoad, 100);
     return (
-      <div className={`w-full h-full bg-gray-200 flex items-center justify-center rounded-lg ${
+      <div className={`w-full h-full bg-gray-200 flex items-center justify-center rounded-lg transition-opacity duration-300 ${
         isLoaded ? "opacity-100" : "opacity-0"
       }`}>
         <div className="text-center">
@@ -253,7 +259,8 @@ const VideoPlayer = ({ url, isLoaded, onLoad, isHovered }: VideoPlayerProps) => 
     );
   }
 
-  // Fallback
+  // Fallback - call onLoad immediately
+  setTimeout(onLoad, 100);
   return <div className="w-full h-full bg-gray-300" />;
 };
 

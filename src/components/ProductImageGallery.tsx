@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { ChevronLeft, ChevronRight, ZoomIn } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -15,21 +15,8 @@ export default function ProductImageGallery({
   discount = 0 
 }: ProductImageGalleryProps) {
   const [selectedImage, setSelectedImage] = useState(0);
-  const [isZoomed, setIsZoomed] = useState(false);
-  const [zoomPosition, setZoomPosition] = useState({ x: 50, y: 50 });
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const imageContainerRef = useRef<HTMLDivElement>(null);
-
-  // Handle mouse move for zoom
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!imageContainerRef.current || !isZoomed) return;
-
-    const rect = imageContainerRef.current.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width) * 100;
-    const y = ((e.clientY - rect.top) / rect.height) * 100;
-    
-    setZoomPosition({ x, y });
-  };
 
   // Handle swipe gestures
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -72,30 +59,14 @@ export default function ProductImageGallery({
       {/* Main Image */}
       <div
         ref={imageContainerRef}
-        className="relative aspect-[3/4] rounded-lg overflow-hidden bg-muted cursor-zoom-in group"
-        onMouseEnter={() => setIsZoomed(true)}
-        onMouseLeave={() => {
-          setIsZoomed(false);
-          setZoomPosition({ x: 50, y: 50 });
-        }}
-        onMouseMove={handleMouseMove}
+        className="relative aspect-[3/4] rounded-lg overflow-hidden bg-muted group"
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
         <img
           src={images[selectedImage]}
           alt={`${productName} - Image ${selectedImage + 1}`}
-          className={cn(
-            "w-full h-full object-cover transition-transform duration-300",
-          )}
-          style={
-            isZoomed
-              ? {
-                  transform: "scale(2)",
-                  transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%`,
-                }
-              : undefined
-          }
+          className="w-full h-full object-cover"
           draggable={false}
         />
 
@@ -105,14 +76,6 @@ export default function ProductImageGallery({
             -{discount}% OFF
           </span>
         )}
-
-        {/* Zoom Indicator */}
-        <div className={cn(
-          "absolute bottom-4 right-4 bg-background/80 backdrop-blur-sm rounded-full p-2 transition-opacity",
-          isZoomed ? "opacity-0" : "opacity-100 group-hover:opacity-100"
-        )}>
-          <ZoomIn className="h-5 w-5 text-foreground" />
-        </div>
 
         {/* Mobile Navigation Arrows */}
         <div className="absolute inset-y-0 left-0 right-0 flex items-center justify-between px-2 md:hidden pointer-events-none">

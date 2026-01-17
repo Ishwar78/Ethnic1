@@ -27,6 +27,28 @@ interface SavedAddress {
   phone?: string;
 }
 
+// Function to check if two addresses are identical
+const areAddressesEqual = (addr1: SavedAddress, addr2: SavedAddress): boolean => {
+  return (
+    addr1.street?.toLowerCase().trim() === addr2.street?.toLowerCase().trim() &&
+    addr1.city?.toLowerCase().trim() === addr2.city?.toLowerCase().trim() &&
+    addr1.state?.toLowerCase().trim() === addr2.state?.toLowerCase().trim() &&
+    addr1.zipCode?.trim() === addr2.zipCode?.trim()
+  );
+};
+
+// Function to deduplicate addresses
+const deduplicateAddresses = (addresses: SavedAddress[]): SavedAddress[] => {
+  const seen: SavedAddress[] = [];
+  for (const addr of addresses) {
+    const isDuplicate = seen.some(seenAddr => areAddressesEqual(seenAddr, addr));
+    if (!isDuplicate) {
+      seen.push(addr);
+    }
+  }
+  return seen;
+};
+
 export default function Checkout() {
   const navigate = useNavigate();
   const { items, subtotal, totalSavings, clearCart } = useCart();
@@ -99,8 +121,10 @@ export default function Checkout() {
         });
       }
 
-      setSavedAddresses(addresses);
-      if (addresses.length > 0) {
+      // Deduplicate addresses before setting them
+      const uniqueAddresses = deduplicateAddresses(addresses);
+      setSavedAddresses(uniqueAddresses);
+      if (uniqueAddresses.length > 0) {
         setSelectedAddressIndex(0);
         setIsAddingNewAddress(false);
       } else {
@@ -220,31 +244,62 @@ export default function Checkout() {
       // Save new address to user profile if adding new address
       if (isAddingNewAddress && token && user) {
         try {
-          const response = await fetch(`${API_URL}/auth/profile`, {
-            method: 'PUT',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`,
-            },
-            body: JSON.stringify({
-              addAddress: {
-                label: `${shippingAddress.firstName || 'Home'}`,
-                street: shippingAddress.address,
-                city: shippingAddress.city,
-                state: shippingAddress.state,
-                zipCode: shippingAddress.pincode,
-                country: "India",
-                phone: shippingAddress.phone,
-              },
-              phone: shippingAddress.phone,
-            }),
-          });
+          const newAddr: SavedAddress = {
+            street: shippingAddress.address,
+            city: shippingAddress.city,
+            state: shippingAddress.state,
+            zipCode: shippingAddress.pincode,
+            country: "India",
+            phone: shippingAddress.phone,
+          };
 
-          if (!response.ok) {
-            console.error('Failed to save address to profile');
+          // Check if this address already exists to prevent duplicates
+          const isDuplicate = savedAddresses.some(addr => areAddressesEqual(addr, newAddr));
+
+          if (!isDuplicate) {
+            const response = await fetch(`${API_URL}/auth/profile`, {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+              },
+              body: JSON.stringify({
+                addAddress: {
+                  label: `${shippingAddress.firstName || 'Home'}`,
+                  street: shippingAddress.address,
+                  city: shippingAddress.city,
+                  state: shippingAddress.state,
+                  zipCode: shippingAddress.pincode,
+                  country: "India",
+                  phone: shippingAddress.phone,
+                },
+                phone: shippingAddress.phone,
+              }),
+            });
+
+            if (response.ok) {
+              const updatedUserData = await response.json();
+              // Update saved addresses with the new address and deduplicate
+              if (updatedUserData.user?.addresses) {
+                const mappedAddresses = updatedUserData.user.addresses.map((addr: any) => ({
+                  street: addr.street || '',
+                  city: addr.city || '',
+                  state: addr.state || '',
+                  zipCode: addr.zipCode || '',
+                  country: addr.country || '',
+                  phone: addr.phone || '',
+                }));
+                setSavedAddresses(deduplicateAddresses(mappedAddresses));
+              }
+              toast.success("Address saved successfully!");
+            } else {
+              console.error('Failed to save address to profile');
+              toast.error("Failed to save address");
+            }
           }
         } catch (error) {
           console.error('Error saving address:', error);
+          toast.error("Error saving address");
         }
       }
 

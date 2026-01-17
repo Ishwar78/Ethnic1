@@ -38,7 +38,7 @@ router.post('/', authMiddleware, async (req, res) => {
 // User: Get their own tickets
 router.get('/my', authMiddleware, async (req, res) => {
   try {
-    const tickets = await Ticket.find({ userId: req.user.id })
+    const tickets = await Ticket.find({ userId: req.user._id })
       .sort({ createdAt: -1 });
 
     res.json({

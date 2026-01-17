@@ -124,7 +124,9 @@ export default function HeroSlider() {
         const videoSource = isVideoType && mediaUrl ? getVideoSource(mediaUrl) : null;
         const isYouTube = videoSource?.type === 'youtube';
         const isInstagram = videoSource?.type === 'instagram';
-        const isDirectVideo = videoSource?.type === 'direct';
+        const isVimeo = videoSource?.type === 'vimeo';
+        const isTikTok = videoSource?.type === 'tiktok';
+        const isHtml5Video = videoSource?.type === 'html5';
 
         return (
           <div
@@ -138,10 +140,10 @@ export default function HeroSlider() {
           >
             {/* Diagonal Media Container */}
             <div className="absolute right-0 top-0 h-full w-full md:w-[65%] overflow-hidden">
-              {isYouTube ? (
+              {isYouTube && videoSource?.embedUrl ? (
                 <>
                   <iframe
-                    src={videoSource.src}
+                    src={videoSource.embedUrl}
                     className="absolute inset-0 w-full h-full object-cover transform origin-left md:skew-x-[-6deg] md:translate-x-12 scale-110"
                     allow="autoplay; fullscreen; picture-in-picture"
                     allowFullScreen
@@ -149,11 +151,22 @@ export default function HeroSlider() {
                   />
                   <div className="absolute inset-0 bg-gradient-to-r from-background via-background/60 to-transparent md:skew-x-[-6deg] md:translate-x-12" />
                 </>
-              ) : isInstagram ? (
+              ) : isVimeo && videoSource?.embedUrl ? (
+                <>
+                  <iframe
+                    src={videoSource.embedUrl}
+                    className="absolute inset-0 w-full h-full object-cover transform origin-left md:skew-x-[-6deg] md:translate-x-12 scale-110"
+                    allow="autoplay; fullscreen; picture-in-picture"
+                    allowFullScreen
+                    frameBorder="0"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-r from-background via-background/60 to-transparent md:skew-x-[-6deg] md:translate-x-12" />
+                </>
+              ) : isInstagram && videoSource?.embedUrl ? (
                 <>
                   <div className="absolute inset-0 bg-background/50 flex items-center justify-center transform origin-left md:skew-x-[-6deg] md:translate-x-12">
                     <iframe
-                      src={videoSource.src}
+                      src={videoSource.embedUrl}
                       className="w-full h-full max-w-md"
                       style={{ maxHeight: '600px' }}
                       allowFullScreen
@@ -162,14 +175,29 @@ export default function HeroSlider() {
                   </div>
                   <div className="absolute inset-0 bg-gradient-to-r from-background via-background/60 to-transparent md:skew-x-[-6deg] md:translate-x-12" />
                 </>
-              ) : isDirectVideo ? (
+              ) : isTikTok && videoSource?.embedUrl ? (
+                <>
+                  <div className="absolute inset-0 bg-background/50 flex items-center justify-center transform origin-left md:skew-x-[-6deg] md:translate-x-12">
+                    <iframe
+                      src={videoSource.embedUrl}
+                      className="w-full h-full"
+                      allowFullScreen
+                      frameBorder="0"
+                    />
+                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-r from-background via-background/60 to-transparent md:skew-x-[-6deg] md:translate-x-12" />
+                </>
+              ) : isHtml5Video && videoSource?.directUrl ? (
                 <>
                   <video
-                    src={videoSource.src}
+                    src={videoSource.directUrl}
                     autoPlay
                     muted
                     loop
                     playsInline
+                    onError={(e) => {
+                      console.error('Video load error:', { url: videoSource.directUrl, error: e.currentTarget.error?.message });
+                    }}
                     className="absolute inset-0 w-full h-full object-cover transform origin-left md:skew-x-[-6deg] md:translate-x-12 scale-110"
                   />
                   <div className="absolute inset-0 bg-gradient-to-r from-background via-background/60 to-transparent md:skew-x-[-6deg] md:translate-x-12" />
