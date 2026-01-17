@@ -397,7 +397,7 @@ export default function AdminDashboard() {
       </Helmet>
 
       <div className="flex min-h-screen w-full bg-background">
-        <AdminSidebar />
+        <AdminSidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 
         <main className="flex-1 p-6 overflow-auto">
           <div className="mb-8">
