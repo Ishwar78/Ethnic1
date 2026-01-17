@@ -59,13 +59,7 @@ export default function ProductImageGallery({
       {/* Main Image */}
       <div
         ref={imageContainerRef}
-        className="relative aspect-[3/4] rounded-lg overflow-hidden bg-muted cursor-zoom-in group"
-        onMouseEnter={() => setIsZoomed(true)}
-        onMouseLeave={() => {
-          setIsZoomed(false);
-          setZoomPosition({ x: 50, y: 50 });
-        }}
-        onMouseMove={handleMouseMove}
+        className="relative aspect-[3/4] rounded-lg overflow-hidden bg-muted group"
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
