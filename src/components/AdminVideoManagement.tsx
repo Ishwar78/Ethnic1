@@ -42,6 +42,86 @@ interface VideoItem {
 
 const API_URL = import.meta.env.VITE_API_URL || '/api';
 
+/**
+ * Video Preview Component - Shows preview for all video types
+ */
+interface VideoPreviewProps {
+  url: string;
+}
+
+const VideoPreview = ({ url }: VideoPreviewProps) => {
+  if (!url) return null;
+
+  const videoSource = parseVideoSource(url);
+  const isYouTube = videoSource.type === 'youtube';
+  const isVimeo = videoSource.type === 'vimeo';
+  const isInstagram = videoSource.type === 'instagram';
+  const isTikTok = videoSource.type === 'tiktok';
+  const isHtml5 = videoSource.type === 'html5';
+
+  return (
+    <div className="mt-3 space-y-2">
+      {isYouTube && videoSource.embedUrl && (
+        <div className="relative w-full h-40 rounded-lg overflow-hidden border border-border bg-black">
+          <iframe
+            src={videoSource.embedUrl}
+            className="w-full h-full"
+            allow="autoplay; fullscreen; picture-in-picture"
+            allowFullScreen
+            frameBorder="0"
+          />
+        </div>
+      )}
+      {isVimeo && videoSource.embedUrl && (
+        <div className="relative w-full h-40 rounded-lg overflow-hidden border border-border bg-black">
+          <iframe
+            src={videoSource.embedUrl}
+            className="w-full h-full"
+            allow="autoplay; fullscreen; picture-in-picture"
+            allowFullScreen
+            frameBorder="0"
+          />
+        </div>
+      )}
+      {isInstagram && videoSource.embedUrl && (
+        <div className="relative w-full rounded-lg overflow-hidden border border-border bg-black/5 p-4 flex items-center justify-center min-h-40">
+          <div className="text-center">
+            <ExternalLink className="h-8 w-8 text-primary mx-auto mb-2" />
+            <p className="text-sm font-medium">Instagram Preview</p>
+            <a href={url} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline mt-1">
+              Open in Instagram
+            </a>
+          </div>
+        </div>
+      )}
+      {isTikTok && videoSource.embedUrl && (
+        <div className="relative w-full rounded-lg overflow-hidden border border-border bg-black/5 p-4 flex items-center justify-center min-h-40">
+          <div className="text-center">
+            <Play className="h-8 w-8 text-primary mx-auto mb-2" />
+            <p className="text-sm font-medium">TikTok Video</p>
+            <a href={url} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline mt-1">
+              Open on TikTok
+            </a>
+          </div>
+        </div>
+      )}
+      {isHtml5 && videoSource.directUrl && (
+        <div className="relative w-full h-40 rounded-lg overflow-hidden border border-border bg-black">
+          <video
+            src={videoSource.directUrl}
+            className="w-full h-full object-cover"
+            controls
+            onError={(e) => {
+              const target = e.target as HTMLVideoElement;
+              target.style.display = 'none';
+            }}
+          />
+        </div>
+      )}
+    </div>
+  );
+};
+
 const AdminVideoManagement = () => {
   const { token } = useAuth();
   const [videos, setVideos] = useState<VideoItem[]>([]);
