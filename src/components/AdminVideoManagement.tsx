@@ -332,7 +332,7 @@ const AdminVideoManagement = () => {
                       <SelectValue placeholder="Select badge" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">None</SelectItem>
+                      <SelectItem value="none">None</SelectItem>
                       <SelectItem value="NEW">New</SelectItem>
                       <SelectItem value="BESTSELLER">Bestseller</SelectItem>
                     </SelectContent>
