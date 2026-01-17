@@ -14,6 +14,11 @@ export default function KurtaSets() {
       try {
         setIsLoading(true);
         const response = await fetch(`${API_URL}/products?category=ethnic_wear`);
+
+        if (!response.ok) {
+          throw new Error(`API Error: ${response.status}`);
+        }
+
         const data = await response.json();
         if (data.success || data.products) {
           const filtered = (data.products || []).filter((p: any) => p.subcategory === "Kurta Sets");
