@@ -116,6 +116,10 @@ export default function SupportTicketForm() {
         });
         setFormData({ subject: "", category: "", orderId: "", message: "" });
         fetchTickets();
+        // Auto-select and show the newly created ticket
+        if (data.ticket) {
+          setSelectedTicket(data.ticket);
+        }
       } else {
         toast({
           title: "Error",
