@@ -80,7 +80,12 @@ const adminSections: SidebarItem[] = [
   { title: "Settings", icon: Settings, href: "/admin?tab=settings" },
 ];
 
-export default function AdminSidebar() {
+interface AdminSidebarProps {
+  isOpen?: boolean;
+  onClose?: () => void;
+}
+
+export default function AdminSidebar({ isOpen = true, onClose }: AdminSidebarProps) {
   const [collapsed, setCollapsed] = useState(false);
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
   const [pendingOrderCount, setPendingOrderCount] = useState(0);
