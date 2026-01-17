@@ -105,7 +105,7 @@ const AdminVideoManagement = () => {
         category: formData.category,
         price: parseFloat(formData.price),
         originalPrice: parseFloat(formData.originalPrice),
-        badge: formData.badge || null,
+        badge: formData.badge && formData.badge !== 'none' ? formData.badge : null,
         isActive: formData.isActive,
         productId: formData.productId,
       };
